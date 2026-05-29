@@ -1,599 +1,210 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vlo — Pop Vlad-Andrei · Hobby Developer</title>
-    <meta name="description" content="Portfolio of Vlo (Pop Vlad-Andrei) — Python enthusiast, game tinkerer, ice tea lover. Projects synced live from GitHub.">
-
-    <link rel="icon" type="image/png" href="/public/favicon.png" />
-    <link rel="apple-touch-icon" href="/public/favicon.png" />
-
-    <style>
-      :root {
-        color-scheme: dark;
-        --background: #101521;
-        --foreground: #fff8dd;
-        --card: #171d2b;
-        --primary: #f1bb42;
-        --primary-foreground: #101521;
-        --accent: #32c991;
-        --muted: #252c3d;
-        --muted-foreground: #c7bea7;
-        --border: #3d4352;
-        --destructive: #f06c55;
-        --gradient-hero: radial-gradient(ellipse at top, rgba(104, 77, 22, 0.58), transparent 60%), linear-gradient(180deg, #101521, #0c111b);
-        --gradient-amber: linear-gradient(135deg, #ffd56a, #e89531);
-        --shadow-glow: 0 20px 60px -20px rgba(241, 187, 66, 0.5);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background: var(--gradient-hero);
-        color: var(--foreground);
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .container {
-        width: min(1120px, calc(100% - 48px));
-        margin: 0 auto;
-      }
-
-      .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-        padding: 24px 0;
-      }
-
-      .brand,
-      .mono {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      }
-
-      .brand {
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      .brand span,
-      .accent-text {
-        color: var(--primary);
-      }
-
-      .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        color: var(--muted-foreground);
-        font-size: 14px;
-      }
-
-      .nav-links a:hover,
-      .repo:hover h3,
-      .social:hover svg {
-        color: var(--primary);
-      }
-
-      .hero {
-        padding: 64px 0 96px;
-      }
-
-      .eyebrow {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 24px;
-        color: var(--primary);
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      h1,
-      h2,
-      h3,
-      p {
-        margin: 0;
-      }
-
-      h1 {
-        max-width: 900px;
-        font-size: clamp(48px, 9vw, 96px);
-        line-height: 0.95;
-        letter-spacing: 0;
-      }
-
-      .gradient-name {
-        background: var(--gradient-amber);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-
-      .hero-copy {
-        margin-top: 16px;
-        max-width: 720px;
-        color: var(--muted-foreground);
-        font-size: 22px;
-        line-height: 1.45;
-      }
-
-      .hero-copy strong {
-        color: var(--foreground);
-      }
-
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 32px;
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        min-height: 48px;
-        border-radius: 8px;
-        padding: 0 20px;
-        border: 1px solid transparent;
-        font-size: 14px;
-        font-weight: 800;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-      }
-
-      .btn-primary {
-        background: var(--primary);
-        color: var(--primary-foreground);
-        box-shadow: var(--shadow-glow);
-      }
-
-      .btn-secondary {
-        border-color: var(--border);
-        background: var(--card);
-      }
-
-      .btn:hover,
-      .repo:hover,
-      .social:hover {
-        transform: translateY(-2px);
-      }
-
-      section {
-        padding: 80px 0;
-      }
-
-      .narrow {
-        width: min(840px, calc(100% - 48px));
-      }
-
-      h2 {
-        margin-bottom: 32px;
-        font-size: 34px;
-        line-height: 1.1;
-        letter-spacing: 0;
-      }
-
-      .about {
-        display: grid;
-        gap: 20px;
-        color: var(--muted-foreground);
-        font-size: 18px;
-        line-height: 1.7;
-      }
-
-      .about strong {
-        color: var(--primary);
-      }
-
-      .section-header {
-        display: flex;
-        align-items: end;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 40px;
-      }
-
-      .section-header h2 {
-        margin-bottom: 8px;
-      }
-
-      .section-header p {
-        color: var(--muted-foreground);
-      }
-
-      .repo-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
-      }
-
-      .repo,
-      .skeleton,
-      .error {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: var(--card);
-      }
-
-      .repo {
-        display: flex;
-        min-height: 190px;
-        flex-direction: column;
-        padding: 20px;
-        transition: transform 160ms ease, border-color 160ms ease;
-      }
-
-      .repo:hover {
-        border-color: color-mix(in srgb, var(--primary) 70%, transparent);
-      }
-
-      .repo-title {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      .repo h3 {
-        overflow: hidden;
-        font-size: 16px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        transition: color 160ms ease;
-      }
-
-      .repo-desc {
-        display: -webkit-box;
-        min-height: 64px;
-        margin-top: 12px;
-        overflow: hidden;
-        color: var(--muted-foreground);
-        font-size: 14px;
-        line-height: 1.5;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
-      }
-
-      .badges,
-      .meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .badges {
-        margin-top: 10px;
-      }
-
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        border-radius: 6px;
-        padding: 3px 8px;
-        font-size: 12px;
-        font-weight: 800;
-      }
-
-      .badge-public {
-        background: rgba(50, 201, 145, 0.14);
-        color: var(--accent);
-      }
-
-      .badge-archive {
-        background: var(--muted);
-        color: var(--muted-foreground);
-      }
-
-      .dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 999px;
-        background: currentColor;
-      }
-
-      .meta {
-        margin-top: auto;
-        padding-top: 18px;
-        color: var(--muted-foreground);
-        font-size: 12px;
-      }
-
-      .meta span {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .lang-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
-      }
-
-      .skeleton {
-        height: 190px;
-        animation: pulse 1.35s ease-in-out infinite;
-      }
-
-      .error {
-        padding: 24px;
-        color: #ffd0c8;
-        background: rgba(240, 108, 85, 0.12);
-      }
-
-      .socials {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-      }
-
-      .social {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 64px;
-        height: 64px;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: var(--card);
-        color: var(--muted-foreground);
-        transition: transform 160ms ease, border-color 160ms ease, color 160ms ease;
-      }
-
-      .social:hover {
-        border-color: color-mix(in srgb, var(--primary) 70%, transparent);
-      }
-
-      footer {
-        border-top: 1px solid var(--border);
-        padding: 40px 0;
-        color: var(--muted-foreground);
-        font-size: 14px;
-      }
-
-      svg {
-        width: 18px;
-        height: 18px;
-        flex: none;
-      }
-
-      .icon-lg {
-        width: 28px;
-        height: 28px;
-      }
-
-      @keyframes pulse {
-        0%, 100% { opacity: 0.55; }
-        50% { opacity: 1; }
-      }
-
-      @media (max-width: 840px) {
-        .repo-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      @media (max-width: 640px) {
-        .container,
-        .narrow {
-          width: min(100% - 32px, 1120px);
-        }
-
-        .nav {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .nav-links {
-          width: 100%;
-          justify-content: space-between;
-        }
-
-        .hero {
-          padding: 48px 0 72px;
-        }
-
-        .hero-copy {
-          font-size: 18px;
-        }
-
-        section {
-          padding: 64px 0;
-        }
-
-        .repo-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-    <meta property="og:title" content="Vlo — Pop Vlad-Andrei · Hobby Developer">
-  <meta name="twitter:title" content="Vlo — Pop Vlad-Andrei · Hobby Developer">
-  <meta property="og:description" content="Portfolio of Vlo (Pop Vlad-Andrei) — Python enthusiast, game tinkerer, ice tea lover. Projects synced live from GitHub.">
-  <meta name="twitter:description" content="Portfolio of Vlo (Pop Vlad-Andrei) — Python enthusiast, game tinkerer, ice tea lover. Projects synced live from GitHub.">
-  <meta property="og:image" content="/public/og.png">
-  <meta name="twitter:image" content="/public/og.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta property="og:type" content="website">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vlo — Pop Vlad-Andrei · Hobby Developer</title>
+  <meta name="description" content="Portfolio of Vlo (Pop Vlad-Andrei) — Python enthusiast, game tinkerer, ice tea lover. Projects synced live from GitHub.">
+
+  <link rel="icon" type="image/png" href="/public/favicon.png" />
+  <link rel="apple-touch-icon" href="/public/favicon.png" />
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #101521;
+      --foreground: #fff8dd;
+      --card: #171d2b;
+      --primary: #f1bb42;
+      --primary-foreground: #101521;
+      --accent: #32c991;
+      --muted: #252c3d;
+      --muted-foreground: #c7bea7;
+      --border: #3d4352;
+      --destructive: #f06c55;
+      --gradient-hero: radial-gradient(ellipse at top, rgba(104, 77, 22, 0.58), transparent 60%), linear-gradient(180deg, #101521, #0c111b);
+      --gradient-amber: linear-gradient(135deg, #ffd56a, #e89531);
+      --shadow-glow: 0 20px 60px -20px rgba(241, 187, 66, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--gradient-hero);
+      color: var(--foreground);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px 0;
+    }
+
+    .brand {
+      font-size: 14px;
+      font-weight: 700;
+      font-family: ui-monospace, monospace;
+    }
+
+    .brand span { color: var(--primary); }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      color: var(--muted-foreground);
+      font-size: 14px;
+    }
+
+    .hero {
+      padding: 64px 0 96px;
+    }
+
+    h1 {
+      font-size: clamp(48px, 9vw, 96px);
+      line-height: 0.95;
+    }
+
+    .gradient-name {
+      background: var(--gradient-amber);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy {
+      margin-top: 16px;
+      max-width: 720px;
+      color: var(--muted-foreground);
+      font-size: 22px;
+    }
+
+    .repo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .repo {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: transform 160ms ease;
+    }
+
+    .repo:hover {
+      transform: translateY(-2px);
+    }
+
+    .repo h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .repo p {
+      color: var(--muted-foreground);
+      font-size: 14px;
+    }
+
+    .skeleton {
+      height: 190px;
+      border-radius: 12px;
+      background: var(--card);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      color: var(--muted-foreground);
+      font-size: 14px;
+    }
+
+    @media (max-width: 840px) {
+      .repo-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .repo-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-  <body>
-    <main>
-      <nav class="container nav" aria-label="Primary navigation">
-        <a class="brand" href="#top"><span>&gt;</span> vlo.py</a>
-        <div class="nav-links">
-          <a href="#about">About</a>
-          <a href="#projects">Projects</a>
-          <a href="#socials">Socials</a>
-        </div>
-      </nav>
 
-      <section id="top" class="container hero">
-        <div class="eyebrow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a4 4 0 0 1-8 0"/><path d="M4 10h16"/><path d="M5 10l1.5 10h11L19 10"/></svg>
-          brewing ideas with ice tea
-        </div>
-        <h1>Hi, I'm <span class="gradient-name">Vlo</span>.</h1>
-        <p class="hero-copy">aka <strong>Pop Vlad-Andrei</strong> — hobby developer, Python fan, serial over-scoper.</p>
-        <div class="actions">
-          <a class="btn btn-primary" href="#projects">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>
-            See my projects
-          </a>
-          <a class="btn btn-secondary" href="https://github.com/VloStudios" target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A12 12 0 0 0 8.2 23.9c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.3-1.2-1.7-1.2-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.7 2.1 3.4 1.5.1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
-            GitHub
-          </a>
-        </div>
-      </section>
+<body>
+<nav class="container nav">
+  <div class="brand"><span>&gt;</span> vlo.py</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+  </div>
+</nav>
 
-      <section id="about" class="container narrow">
-        <h2>About</h2>
-        <div class="about">
-          <p>Hi, I'm Vlo, a hobby developer and someone who genuinely loves technology and IT. I enjoy building projects, experimenting with ideas, and learning new things by actually creating them. Most of the time, I work with <strong>Python</strong>, and I like making games, apps, and random tech experiments that somehow become bigger projects than I originally planned 💀</p>
-          <p>I'm interested in game development, especially with tools like Pygame, Kivy, and Android Studio. I also enjoy exploring AI, trying out new technologies, and thinking of creative ideas for apps and software. Sometimes I dream way too big — like making operating systems, browsers, or tools that transform one type of project into another.</p>
-          <p>Outside of coding, I enjoy gaming, especially Minecraft, FIFA, Brawl Stars, and Nintendo Switch games. I also make music sometimes and like creative storytelling, fun ideas, and experimenting with tech.</p>
-          <p>I care a lot about creativity and building cool things, and I enjoy exploring just how far an idea can go — even if it starts as something small and randomly turns into a huge project for absolutely no reason 😭</p>
-        </div>
-      </section>
+<section class="container hero">
+  <h1>Hi, I'm <span class="gradient-name">Vlo</span>.</h1>
+  <p class="hero-copy">Pop Vlad-Andrei — hobby developer, Python enjoyer, overthinking projects too much.</p>
+</section>
 
-      <section id="projects" class="container">
-        <div class="section-header">
-          <div>
-            <h2>Projects</h2>
-            <p>Live from <span class="mono accent-text">@VloStudios</span> on GitHub</p>
-          </div>
-        </div>
-        <div id="repo-state" class="repo-grid" aria-live="polite">
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-        </div>
-      </section>
+<section class="container" id="projects">
+  <h2>Projects</h2>
+  <div id="repo-state" class="repo-grid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</section>
 
-      <section id="socials" class="container narrow">
-        <h2>Find me online</h2>
-        <div class="socials">
-          <a class="social" href="https://reddit.com/u/VloTheDev" target="_blank" rel="noreferrer" aria-label="Reddit">
-            <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm5.5 11.2a1.6 1.6 0 0 1-.1.6 3.8 3.8 0 0 1 .1.9c0 2.3-2.9 4.2-6.5 4.2s-6.5-1.9-6.5-4.2a3.8 3.8 0 0 1 .1-.9 1.6 1.6 0 1 1 2-2.4 7.9 7.9 0 0 1 4-1.1l.8-3.6a.4.4 0 0 1 .5-.3l2.6.6a1.2 1.2 0 1 1-.1.6l-2.3-.5-.7 3.2a7.9 7.9 0 0 1 4 1.1 1.6 1.6 0 0 1 2.1 1.8zM9 14a1 1 0 1 0 1-1 1 1 0 0 0-1 1zm6 0a1 1 0 1 0-1 1 1 1 0 0 0 1-1zm-.5 2.4a.4.4 0 0 0-.6 0 3 3 0 0 1-3.8 0 .4.4 0 1 0-.6.6 3.8 3.8 0 0 0 5 0 .4.4 0 0 0 0-.6z"/></svg>
-          </a>
-          <a class="social" href="https://github.com/VloStudios" target="_blank" rel="noreferrer" aria-label="GitHub">
-            <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A12 12 0 0 0 8.2 23.9c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.3-1.2-1.7-1.2-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.7 2.1 3.4 1.5.1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
-          </a>
-          <a class="social" href="https://gitlab.com/VloStudios" target="_blank" rel="noreferrer" aria-label="GitLab">
-            <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m22.7 9.4-.1-.3-2.2-6.7c-.1-.4-.4-.7-.8-.8-.4-.1-.8 0-1.1.3-.1.1-.2.3-.3.5l-1.5 4.7H7.3L5.8 2.4c-.1-.4-.4-.7-.8-.8-.4-.1-.8 0-1.1.3-.1.1-.2.3-.3.5L1.4 9.1l-.1.3a1.6 1.6 0 0 0 .6 1.8l10.1 7.4 10.1-7.4a1.6 1.6 0 0 0 .6-1.8Z"/></svg>
-          </a>
-        </div>
-      </section>
+<footer class="container">
+  © <span id="year"></span> Pop Vlad-Andrei
+</footer>
 
-      <footer class="container mono"><span class="accent-text">$</span> made with python energy & ice tea · © 2026</span> Pop Vlad-Andrei</footer>
-    </main>
+<script>
+  const repoState = document.getElementById("repo-state");
 
-    <script>
-      const repoState = document.getElementById("repo-state");
-      const langColor = {
-        Python: "#32c991",
-        JavaScript: "#e4c747",
-        TypeScript: "#5394d8",
-        HTML: "#e46642",
-        CSS: "#7b66d9",
-        Java: "#d38b3d",
-        Kotlin: "#a35cf0",
-        C: "#7d86a9",
-        "C++": "#bd5aa4",
-        Shell: "#79a67b"
-      };
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-      document.getElementById("year").textContent = new Date().getFullYear();
+  async function fetchRepos() {
+    try {
+      const res = await fetch("https://api.github.com/users/VloStudios/repos?per_page=100");
+      const repos = await res.json();
 
-      function icon(name) {
-        const icons = {
-          external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
-          archive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>',
-          star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
-          fork: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9"/><path d="M12 12v3"/></svg>'
-        };
-        return icons[name] || "";
-      }
+      repoState.innerHTML = repos
+              .filter(r => !r.fork)
+              .map(r => `
+              <a class="repo" href="${r.html_url}" target="_blank">
+                <h3>${r.name}</h3>
+                <p>${r.description || "No description"}</p>
+              </a>
+            `).join("");
 
-      function escapeHtml(value) {
-        return String(value || "").replace(/[&<>'"]/g, (char) => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          "'": "&#39;",
-          '"': "&quot;"
-        })[char]);
-      }
+    } catch (e) {
+      repoState.innerHTML = "<p>Failed to load GitHub repos 😭</p>";
+    }
+  }
 
-      function renderRepos(repos) {
-        const publicRepos = repos.filter((repo) => !repo.fork);
-        if (!publicRepos.length) {
-          repoState.className = "";
-          repoState.innerHTML = '<p style="color: var(--muted-foreground);">No public repositories yet.</p>';
-          return;
-        }
-
-        repoState.className = "repo-grid";
-        repoState.innerHTML = publicRepos.map((repo) => {
-          const language = repo.language ? escapeHtml(repo.language) : "";
-          const languageMarkup = language ? `<span><span class="lang-dot" style="background:${langColor[language] || "#858ba0"}"></span>${language}</span>` : "";
-          const statusMarkup = repo.archived
-            ? `<span class="badge badge-archive">${icon("archive")} Public archive</span>`
-            : '<span class="badge badge-public"><span class="dot"></span> Public</span>';
-
-          return `
-            <a class="repo" href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">
-              <div class="repo-title">
-                <h3>${escapeHtml(repo.name)}</h3>
-                ${icon("external")}
-              </div>
-              <div class="badges">${statusMarkup}</div>
-              <p class="repo-desc">${escapeHtml(repo.description || "No description provided.")}</p>
-              <div class="meta">
-                ${languageMarkup}
-                <span>${icon("star")}${repo.stargazers_count || 0}</span>
-                <span>${icon("fork")}${repo.forks_count || 0}</span>
-              </div>
-            </a>
-          `;
-        }).join("");
-      }
-
-      async function fetchRepos() {
-        try {
-          const response = await fetch("https://api.github.com/users/VloStudios/repos?per_page=100&sort=updated", {
-            headers: { Accept: "application/vnd.github+json" }
-          });
-          if (!response.ok) throw new Error("GitHub API request failed");
-          renderRepos(await response.json());
-        } catch (error) {
-          repoState.className = "";
-          repoState.innerHTML = '<div class="error">Couldn\'t fetch repos from GitHub right now. Try again later.</div>';
-        }
-      }
-
-      fetchRepos();
-    </script>
-  </body>
+  fetchRepos();
+</script>
+</body>
 </html>
