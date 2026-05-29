@@ -17,6 +17,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    environment:
+      name: github-pages   # 🔥 ASTA lipsea
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +28,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Upload artifact (root site)
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
