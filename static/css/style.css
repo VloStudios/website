@@ -1,0 +1,271 @@
+/* Reset and base */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    background: #000;
+    color: #0f0;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+}
+
+/* Matrix canvas */
+#matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* Content overlay */
+.content {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 20px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 3.5rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-top: 10px;
+}
+
+/* Projects section */
+.projects h2 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    text-shadow: 0 0 3px #0f0;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.project-card {
+    background: rgba(0, 20, 0, 0.6);
+    border: 1px solid #0f0;
+    border-radius: 8px;
+    padding: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px #0f0;
+}
+
+.project-card h3 {
+    margin: 0 0 10px;
+    font-size: 1.4rem;
+}
+
+.project-card p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.project-card .meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.project-card a {
+    color: #0f0;
+    text-decoration: none;
+}
+
+.project-card a:hover {
+    text-decoration: underline;
+}
+
+/* Extras section */
+.extras {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.lofi-controls,
+.cookie-clicker-container {
+    flex: 1 1 250px;
+    background: rgba(0, 20, 0, 0.5);
+    border: 1px solid #0f0;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.lofi-controls label,
+.cookie-clicker-container h3 {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+#lofi-select {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 10px;
+    background: #000;
+    color: #0f0;
+    border: 1px solid #0f0;
+    border-radius: 4px;
+}
+
+#lofi-toggle {
+    width: 100%;
+    padding: 8px;
+    background: #000;
+    color: #0f0;
+    border: 1px solid #0f0;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#lofi-toggle:hover {
+    background: #003300;
+}
+
+#lofi-status {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.9rem;
+    opacity: 0.6;
+}
+
+footer a {
+    color: #0f0;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+/* Cookie Clicker Styles */
+.cookie-clicker-container {
+    text-align: center;
+    background: rgba(30,0,30,0.4);
+    border-color: #f09;
+}
+
+#cookie-count {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffb6c1;
+    display: block;
+    margin: 10px 0;
+}
+
+#cookie-button {
+    background: #ffb6c1;
+    color: #8b0000;
+    border: none;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.1s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+#cookie-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+#cookie-button:active {
+    transform: scale(0.95);
+}
+
+/* Cherry blossom petals */
+.petal {
+    position: absolute;
+    top: -20px;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #ffb6c1, #ff69b4);
+    border-radius: 50%;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+#cps {
+    font-weight: bold;
+    color: #98fb98;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    #cookie-button {
+        width: 90px;
+        height: 90px;
+        font-size: 1.5rem;
+    }
+    #cookie-count {
+        font-size: 2rem;
+    }
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2.5rem;
+    }
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+    .extras {
+        flex-direction: column;
+    }
+}
