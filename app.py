@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, send_from_directory, jsonify
 import requests
 import os
 
@@ -9,20 +9,7 @@ GITHUB_API_URL = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 
 @app.route('/')
 def index():
-    # Fetch repositories from GitHub
-    try:
-        response = requests.get(GITHUB_API_URL, timeout=5)
-        if response.status_code == 200:
-            repos = response.json()
-            # Filter out forks if desired, sort by updated
-            repos = [repo for repo in repos if not repo['fork']]
-            repos.sort(key=lambda x: x['updated_at'], reverse=True)
-        else:
-            repos = []
-    except Exception:
-        repos = []
-
-    return render_template('index.html', repos=repos)
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/api/repos')
 def api_repos():
