@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vlo Studios – Developer Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- We'll include some fonts and icons via CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Matrix background canvas -->
+    <canvas id="matrix"></canvas>
+
+    <div class="content">
+        <header>
+            <h1>Vlo Studios</h1>
+            <p class="tagline">Python enthusiast • Ice‑tea aficionado • Lo‑fi beats</p>
+        </header>
+
+        <section class="projects">
+            <h2>Projects</h2>
+            <div id="projects-list" class="projects-grid">
+                <!-- Projects will be injected by JS -->
+            </div>
+        </section>
+
+        <section class="extras">
+            <div class="lofi-controls">
+                <label for="lofi-select">Lo‑fi Track:</label>
+                <select id="lofi-select">
+                    <option value="">-- Choose a track --</option>
+                    <!-- Options will be populated by JS -->
+                </select>
+                <button id="lofi-toggle">▶️ Play</button>
+                <span id="lofi-status">Stopped</span>
+            </div>
+
+            <div class="cookie-clicker-container">
+                <h3>Cherry Clicker</h3>
+                <div id="cookie-display">
+                    <span id="cookie-count">0</span> 🍒
+                </div>
+                <button id="cookie-button">
+                    <span>🌸</span> Click me!
+                </button>
+                <p id="click-per-sec">CPS: <span id="cps">0</span></p>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 Vlo Studios • <a href="https://github.com/VloStudios" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/matrix.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lofi.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cookieclicker.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
