@@ -3,60 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vlo Studios – Developer Portfolio</title>
+    <title>Vlo Studios | Sakura CV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <!-- We'll include some fonts and icons via CDN -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Matrix background canvas -->
-    <canvas id="matrix"></canvas>
+    <div class="petal-layer" aria-hidden="true"></div>
 
-    <div class="content">
-        <header>
-            <h1>Vlo Studios</h1>
-            <p class="tagline">Python enthusiast • Ice‑tea aficionado • Lo‑fi beats</p>
+    <main class="cv-shell">
+        <header class="hero card">
+            <div class="hero-copy">
+                <p class="eyebrow">Sakura-themed portfolio</p>
+                <h1 id="profile-name">VloStudios</h1>
+                <p id="profile-bio">Brewing code like iced tea, one calm commit at a time.</p>
+                <div class="chips">
+                    <span class="chip">🌸 Sakura Vibes</span>
+                    <span class="chip">🧋 Iced Tea Energy</span>
+                    <span class="chip">🎧 Background Music</span>
+                </div>
+                <div class="hero-links">
+                    <a class="btn" href="https://github.com/VloStudios" target="_blank" rel="noreferrer">GitHub</a>
+                    <a class="btn ghost" href="#projects">Projects</a>
+                </div>
+            </div>
+            <img id="avatar" class="avatar" src="https://avatars.githubusercontent.com/u/198949883?v=4" alt="VloStudios avatar">
         </header>
 
-        <section class="projects">
-            <h2>Projects</h2>
-            <div id="projects-list" class="projects-grid">
-                <!-- Projects will be injected by JS -->
+        <section class="card">
+            <h2>CV Snapshot</h2>
+            <div class="stats" id="stats-grid">
+                <article><h3>Followers</h3><p id="followers">-</p></article>
+                <article><h3>Following</h3><p id="following">-</p></article>
+                <article><h3>Public Repos</h3><p id="public-repos">-</p></article>
+                <article><h3>Location</h3><p id="location">Internet</p></article>
+            </div>
+            <p class="small" id="profile-updated">Loading latest profile updates…</p>
+        </section>
+
+        <section class="card tea-card">
+            <h2>Iced Tea Break</h2>
+            <p>
+                Favorite workflow: chill lo-fi, clean commits, and a glass of iced tea while building cool things.
+            </p>
+            <div class="tea-note">Today's blend: Peach Green Tea + Cherry Blossom Mood ✨</div>
+        </section>
+
+        <section class="card" id="projects">
+            <h2>Selected GitHub Projects</h2>
+            <div id="repo-grid" class="repo-grid">
+                <p class="small">Loading repositories…</p>
             </div>
         </section>
 
-        <section class="extras">
-            <div class="lofi-controls">
-                <label for="lofi-select">Lo‑fi Track:</label>
-                <select id="lofi-select">
-                    <option value="">-- Choose a track --</option>
-                    <!-- Options will be populated by JS -->
-                </select>
-                <button id="lofi-toggle">▶️ Play</button>
-                <span id="lofi-status">Stopped</span>
-            </div>
-
-            <div class="cookie-clicker-container">
-                <h3>Cherry Clicker</h3>
-                <div id="cookie-display">
-                    <span id="cookie-count">0</span> 🍒
-                </div>
-                <button id="cookie-button">
-                    <span>🌸</span> Click me!
-                </button>
-                <p id="click-per-sec">CPS: <span id="cps">0</span></p>
+        <section class="card music-card">
+            <h2>Background Music</h2>
+            <p>Press play to start ambient lo-fi synth vibes.</p>
+            <div class="music-controls">
+                <button id="music-toggle" class="btn" type="button">▶ Play Music</button>
+                <span id="music-status" class="small">Stopped</span>
             </div>
         </section>
 
-        <footer>
-            <p>© 2026 Vlo Studios • <a href="https://github.com/VloStudios" target="_blank">GitHub</a></p>
+        <footer class="card footer-card">
+            <p>Made with sakura petals, iced tea, and GitHub data.</p>
+            <p>
+                <a href="https://github.com/VloStudios" target="_blank" rel="noreferrer">github.com/VloStudios</a>
+            </p>
         </footer>
-    </div>
+    </main>
 
-    <script src="js/matrix.js"></script>
-    <script src="js/lofi.js"></script>
-    <script src="js/cookieclicker.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
