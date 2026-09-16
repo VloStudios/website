@@ -1,79 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vlo Studios | Sakura CV</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VloStudios — Sakura Iced Tea</title>
+  <meta name="description" content="Sakura + iced-tea themed portfolio and mini CV for VloStudios.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&family=Zen+Kurenaido&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <div class="petal-layer" aria-hidden="true"></div>
+  <div class="rain" id="rain" aria-hidden="true"></div>
 
-    <main class="cv-shell">
-        <header class="hero card">
-            <div class="hero-copy">
-                <p class="eyebrow">Sakura-themed portfolio</p>
-                <h1 id="profile-name">VloStudios</h1>
-                <p id="profile-bio">Brewing code like iced tea, one calm commit at a time.</p>
-                <div class="chips">
-                    <span class="chip">🌸 Sakura Vibes</span>
-                    <span class="chip">🧋 Iced Tea Energy</span>
-                    <span class="chip">🎧 Background Music</span>
-                </div>
-                <div class="hero-links">
-                    <a class="btn" href="https://github.com/VloStudios" target="_blank" rel="noreferrer">GitHub</a>
-                    <a class="btn ghost" href="#projects">Projects</a>
-                </div>
-            </div>
-            <img id="avatar" class="avatar" src="https://avatars.githubusercontent.com/u/198949883?v=4" alt="VloStudios avatar">
-        </header>
+  <header class="hero">
+    <p class="kicker">🌸 Sakura x Iced Tea</p>
+    <h1 id="display-name">VloStudios</h1>
+    <p id="tagline">Refreshing projects, calm vibes, and a tiny rainstorm of iced tea.</p>
+    <nav class="hero-actions">
+      <a class="btn" href="#cv">Mini CV</a>
+      <a class="btn ghost" href="#projects">Projects</a>
+      <a class="btn ghost" href="https://github.com/VloStudios" target="_blank" rel="noreferrer">GitHub</a>
+    </nav>
+  </header>
 
-        <section class="card">
-            <h2>CV Snapshot</h2>
-            <div class="stats" id="stats-grid">
-                <article><h3>Followers</h3><p id="followers">-</p></article>
-                <article><h3>Following</h3><p id="following">-</p></article>
-                <article><h3>Public Repos</h3><p id="public-repos">-</p></article>
-                <article><h3>Location</h3><p id="location">Internet</p></article>
-            </div>
-            <p class="small" id="profile-updated">Loading latest profile updates…</p>
-        </section>
+  <main class="layout">
+    <section class="panel" id="cv">
+      <h2>Mini CV</h2>
+      <p id="bio">Loading profile from GitHub…</p>
+      <dl class="facts">
+        <div><dt>Username</dt><dd id="username">-</dd></div>
+        <div><dt>Location</dt><dd id="location">-</dd></div>
+        <div><dt>Followers</dt><dd id="followers">-</dd></div>
+        <div><dt>Public Repos</dt><dd id="repos-count">-</dd></div>
+        <div><dt>Top Languages</dt><dd id="top-languages">-</dd></div>
+        <div><dt>Profile Updated</dt><dd id="updated">-</dd></div>
+      </dl>
+    </section>
 
-        <section class="card tea-card">
-            <h2>Iced Tea Break</h2>
-            <p>
-                Favorite workflow: chill lo-fi, clean commits, and a glass of iced tea while building cool things.
-            </p>
-            <div class="tea-note">Today's blend: Peach Green Tea + Cherry Blossom Mood ✨</div>
-        </section>
+    <section class="panel tea-panel">
+      <h2>Sakura Tea Notes</h2>
+      <ul>
+        <li>Theme: Cherry blossom twilight + cold tea glow</li>
+        <li>Mood: Soft pink skies and lo-fi refresh</li>
+        <li>Forecast: 100% chance of raining iced tea 🧋</li>
+      </ul>
+    </section>
 
-        <section class="card" id="projects">
-            <h2>Selected GitHub Projects</h2>
-            <div id="repo-grid" class="repo-grid">
-                <p class="small">Loading repositories…</p>
-            </div>
-        </section>
+    <section class="panel" id="projects">
+      <h2>Recent GitHub Projects</h2>
+      <div class="repo-grid" id="repo-grid">
+        <p class="muted">Loading repositories…</p>
+      </div>
+    </section>
+  </main>
 
-        <section class="card music-card">
-            <h2>Background Music</h2>
-            <p>Press play to start ambient lo-fi synth vibes.</p>
-            <div class="music-controls">
-                <button id="music-toggle" class="btn" type="button">▶ Play Music</button>
-                <span id="music-status" class="small">Stopped</span>
-            </div>
-        </section>
+  <footer>
+    <p>Made for <a href="https://github.com/VloStudios" target="_blank" rel="noreferrer">@VloStudios</a> with Sakura petals and iced tea rain.</p>
+    <p><a href="./404.html">See themed 404 page</a></p>
+  </footer>
 
-        <footer class="card footer-card">
-            <p>Made with sakura petals, iced tea, and GitHub data.</p>
-            <p>
-                <a href="https://github.com/VloStudios" target="_blank" rel="noreferrer">github.com/VloStudios</a>
-            </p>
-        </footer>
-    </main>
-
-    <script src="js/main.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 </html>
