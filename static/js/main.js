@@ -1,187 +1,133 @@
-const username = "VloStudios";
+const user = "VloStudios";
 
-const el = {
-    name: document.getElementById("profile-name"),
-    bio: document.getElementById("profile-bio"),
-    avatar: document.getElementById("avatar"),
-    followers: document.getElementById("followers"),
-    following: document.getElementById("following"),
-    publicRepos: document.getElementById("public-repos"),
-    location: document.getElementById("location"),
-    profileUpdated: document.getElementById("profile-updated"),
-    repoGrid: document.getElementById("repo-grid"),
-    musicToggle: document.getElementById("music-toggle"),
-    musicStatus: document.getElementById("music-status")
+const ui = {
+  displayName: document.getElementById("display-name"),
+  tagline: document.getElementById("tagline"),
+  bio: document.getElementById("bio"),
+  username: document.getElementById("username"),
+  location: document.getElementById("location"),
+  followers: document.getElementById("followers"),
+  reposCount: document.getElementById("repos-count"),
+  topLanguages: document.getElementById("top-languages"),
+  updated: document.getElementById("updated"),
+  repoGrid: document.getElementById("repo-grid"),
+  rain: document.getElementById("rain")
 };
 
-let audioContext;
-let masterGain;
-let oscillators = [];
-let lfo;
-
-function prettyDate(isoDate) {
-    if (!isoDate) return "Unknown";
-    return new Date(isoDate).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-    });
+function esc(text) {
+  return String(text ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
-function escapeHtml(text) {
-    return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
+function formatDate(iso) {
+  if (!iso) return "Unknown";
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
 }
 
-async function loadProfile() {
-    try {
-        const response = await fetch(`https://api.github.com/users/${username}`);
-        if (!response.ok) throw new Error("Failed to load profile");
-        const profile = await response.json();
+function makeRain() {
+  const symbols = ["🧋", "🌸", "💧"];
+  const count = 36;
 
-        el.name.textContent = profile.name || profile.login || username;
-        el.bio.textContent = profile.bio || "Builder, creator, and calm code enthusiast.";
-        el.avatar.src = profile.avatar_url || el.avatar.src;
-        el.avatar.alt = `${profile.login || username} avatar`;
-        el.followers.textContent = profile.followers ?? "-";
-        el.following.textContent = profile.following ?? "-";
-        el.publicRepos.textContent = profile.public_repos ?? "-";
-        el.location.textContent = profile.location || "Online";
-        el.profileUpdated.textContent = `Profile updated: ${prettyDate(profile.updated_at)}`;
-    } catch {
-        el.profileUpdated.textContent = "Could not load profile from GitHub right now.";
-    }
+  for (let i = 0; i < count; i += 1) {
+    const d = document.createElement("span");
+    d.className = "drop";
+    d.textContent = symbols[i % symbols.length];
+    d.style.left = `${Math.random() * 100}%`;
+    d.style.animationDuration = `${6 + Math.random() * 7}s`;
+    d.style.animationDelay = `${Math.random() * -12}s`;
+    ui.rain.appendChild(d);
+  }
+}
+
+function topLanguagesFromRepos(repos) {
+  const tally = {};
+  repos.forEach((r) => {
+    if (r?.fork || !r?.language) return;
+    tally[r.language] = (tally[r.language] || 0) + 1;
+  });
+
+  return Object.entries(tally)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([name]) => name)
+    .join(", ");
 }
 
 function renderRepos(repos) {
-    const visible = repos
-        .filter((repo) => !repo.fork)
-        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-        .slice(0, 6);
-
-    if (visible.length === 0) {
-        el.repoGrid.innerHTML = '<p class="small">No public repositories to show yet.</p>';
-        return;
-    }
-
-    el.repoGrid.innerHTML = visible.map((repo) => {
-        const name = escapeHtml(repo.name);
-        const description = escapeHtml(repo.description || "No description provided.");
-        const language = escapeHtml(repo.language || "Mixed");
-        const stars = Number(repo.stargazers_count || 0);
-        const url = escapeHtml(repo.html_url);
-        const updated = prettyDate(repo.updated_at);
-
-        return `
-            <article class="repo-card">
-                <h3><a href="${url}" target="_blank" rel="noreferrer">${name}</a></h3>
-                <p>${description}</p>
-                <p class="repo-meta">${language} • ★ ${stars} • Updated ${updated}</p>
-            </article>
-        `;
-    }).join("");
-}
-
-async function loadRepos() {
-    try {
-        const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`);
-        if (!response.ok) throw new Error("Failed to load repos");
-        const repos = await response.json();
-        renderRepos(repos);
-    } catch {
-        el.repoGrid.innerHTML = '<p class="small">Could not load repositories right now.</p>';
-    }
-}
-
-function setMusicUI(isPlaying) {
-    el.musicToggle.textContent = isPlaying ? "⏸ Pause Music" : "▶ Play Music";
-    el.musicStatus.textContent = isPlaying ? "Playing" : "Stopped";
-}
-
-function stopAmbient() {
-    oscillators.forEach((osc) => {
-        try {
-            osc.stop();
-        } catch {
-            // no-op
-        }
-    });
-    oscillators = [];
-
-    if (lfo) {
-        try {
-            lfo.stop();
-        } catch {
-            // no-op
-        }
-        lfo.disconnect();
-        lfo = null;
-    }
-
-    if (masterGain) {
-        masterGain.disconnect();
-        masterGain = null;
-    }
-}
-
-function startAmbient() {
-    audioContext = audioContext || new window.AudioContext();
-    masterGain = audioContext.createGain();
-    masterGain.gain.value = 0.04;
-    masterGain.connect(audioContext.destination);
-
-    const notes = [220, 261.63, 329.63];
-    oscillators = notes.map((frequency, index) => {
-        const osc = audioContext.createOscillator();
-        const oscGain = audioContext.createGain();
-        osc.type = index === 0 ? "sine" : "triangle";
-        osc.frequency.value = frequency;
-        oscGain.gain.value = index === 0 ? 0.5 : 0.22;
-        osc.connect(oscGain);
-        oscGain.connect(masterGain);
-        osc.start();
-        return osc;
+  const cards = repos
+    .filter((r) => !r.fork)
+    .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+    .slice(0, 6)
+    .map((repo) => {
+      const name = esc(repo.name);
+      const link = esc(repo.html_url);
+      const description = esc(repo.description || "No description yet.");
+      const language = esc(repo.language || "Mixed");
+      return `
+        <article class="repo-card">
+          <h3><a href="${link}" target="_blank" rel="noreferrer">${name}</a></h3>
+          <p>${description}</p>
+          <p class="meta">${language} · ★ ${repo.stargazers_count || 0} · Updated ${formatDate(repo.updated_at)}</p>
+        </article>
+      `;
     });
 
-    lfo = audioContext.createOscillator();
-    const lfoGain = audioContext.createGain();
-    lfo.type = "sine";
-    lfo.frequency.value = 0.18;
-    lfoGain.gain.value = 9;
-    lfo.connect(lfoGain);
-    lfoGain.connect(oscillators[1].frequency);
-    lfo.start();
+  if (!cards.length) {
+    ui.repoGrid.innerHTML = '<p class="muted">No public repositories available right now.</p>';
+    return;
+  }
+
+  ui.repoGrid.innerHTML = cards.join("");
 }
 
-function setupMusic() {
-    let isPlaying = false;
-    setMusicUI(false);
+async function loadData() {
+  let profile = null;
+  let repos = [];
 
-    el.musicToggle.addEventListener("click", async () => {
-        if (!isPlaying) {
-            try {
-                if (audioContext && audioContext.state === "suspended") {
-                    await audioContext.resume();
-                }
-                startAmbient();
-                isPlaying = true;
-                setMusicUI(true);
-            } catch {
-                el.musicStatus.textContent = "Audio blocked by browser.";
-            }
-            return;
-        }
+  try {
+    const [profileRes, reposRes] = await Promise.all([
+      fetch(`https://api.github.com/users/${user}`),
+      fetch(`https://api.github.com/users/${user}/repos?per_page=100`)
+    ]);
 
-        stopAmbient();
-        isPlaying = false;
-        setMusicUI(false);
-    });
+    if (!profileRes.ok || !reposRes.ok) {
+      throw new Error("GitHub API unavailable");
+    }
+
+    profile = await profileRes.json();
+    repos = await reposRes.json();
+  } catch {
+    ui.bio.textContent = "Could not fetch GitHub live data right now, but the tea vibes remain immaculate.";
+    ui.username.textContent = user;
+    ui.location.textContent = "Internet";
+    ui.followers.textContent = "-";
+    ui.reposCount.textContent = "-";
+    ui.topLanguages.textContent = "-";
+    ui.updated.textContent = "Unavailable";
+    ui.repoGrid.innerHTML = '<p class="muted">Unable to load repositories currently.</p>';
+    return;
+  }
+
+  ui.displayName.textContent = profile.name || profile.login || user;
+  ui.tagline.textContent = profile.bio || "Builder of internet things, brewed cold and served with Sakura.";
+  ui.bio.textContent = `${profile.name || profile.login || user} is a GitHub creator focused on shipping projects and experiments.`;
+  ui.username.textContent = profile.login || user;
+  ui.location.textContent = profile.location || "Online";
+  ui.followers.textContent = String(profile.followers ?? "-");
+  ui.reposCount.textContent = String(profile.public_repos ?? "-");
+  ui.topLanguages.textContent = topLanguagesFromRepos(repos) || "Mixed";
+  ui.updated.textContent = formatDate(profile.updated_at);
+
+  renderRepos(repos);
 }
 
-loadProfile();
-loadRepos();
-setupMusic();
+makeRain();
+loadData();

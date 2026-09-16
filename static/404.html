@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Tea Storm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Zen+Kurenaido&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Outfit", sans-serif;
+      color: #4c2c3b;
+      background:
+        radial-gradient(85% 60% at 50% 10%, #ffe6f2, transparent 60%),
+        linear-gradient(180deg, #fff7fb, #ffe9f4);
+      overflow: hidden;
+    }
+    .wrap {
+      width: min(92vw, 680px);
+      background: rgba(255,255,255,.84);
+      border: 1px solid rgba(219,95,146,.25);
+      border-radius: 1rem;
+      text-align: center;
+      padding: 1.5rem;
+      box-shadow: 0 12px 28px rgba(105, 44, 70, 0.1);
+    }
+    h1 {
+      margin: 0;
+      font-family: "Zen Kurenaido", sans-serif;
+      font-size: clamp(2.5rem, 10vw, 5rem);
+    }
+    p { margin: .5rem 0; }
+    a {
+      display: inline-block;
+      margin-top: .7rem;
+      text-decoration: none;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #f091b4, #db5f92);
+      border-radius: 999px;
+      padding: .6rem 1rem;
+    }
+    .rain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .7;
+    }
+    .drop {
+      position: absolute;
+      top: -10vh;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      to { transform: translateY(120vh); }
+    }
+  </style>
+</head>
+<body>
+  <div class="rain" id="rain" aria-hidden="true"></div>
+  <main class="wrap">
+    <h1>404</h1>
+    <p>Oops, this page drifted away in a Sakura iced-tea storm.</p>
+    <p>Catch a fresh cup by returning home.</p>
+    <a href="./index.html">Back to Homepage</a>
+  </main>
+  <script>
+    const rain = document.getElementById('rain');
+    const symbols = ['🧋', '🌸', '💧'];
+    for (let i = 0; i < 28; i += 1) {
+      const d = document.createElement('span');
+      d.className = 'drop';
+      d.textContent = symbols[i % symbols.length];
+      d.style.left = `${Math.random() * 100}%`;
+      d.style.animationDuration = `${6 + Math.random() * 6}s`;
+      d.style.animationDelay = `${Math.random() * -10}s`;
+      rain.appendChild(d);
+    }
+  </script>
+</body>
+</html>
