@@ -9,10 +9,10 @@ This repository now contains a full static-first remake of the site with a brand
 
 ## Project layout
 
-- `/static/index.html` — primary GitHub Pages entrypoint
-- `/static/css/style.css` — complete redesign styles
-- `/static/js/main.js` — animation + GitHub data loading + CV/repo rendering
-- `/static/404.html` — custom Sakura iced-tea 404 page
+- `/index.html` — primary site entrypoint
+- `/css/style.css` — complete redesign styles
+- `/js/main.js` — animation + GitHub data loading + CV/repo rendering
+- `/404.html` — custom Sakura iced-tea 404 page
 - `/app.py` — optional local Flask serving
 
 ## Run locally
@@ -26,4 +26,4 @@ Then open `http://localhost:5001`.
 
 ## GitHub Pages compatibility
 
-GitHub Pages deploys from `/static` in this repo's workflow, so all published assets (including `404.html`, `CNAME`, and `.nojekyll`) are kept in `/static`.
+GitHub Pages deploys from the repository root in this repo's workflow, so published assets (including `404.html`, `CNAME`, and `.nojekyll`) are kept at the root.
