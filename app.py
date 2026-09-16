@@ -1,18 +1,14 @@
 from flask import Flask, send_from_directory, jsonify
 import requests
-import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 
 GITHUB_USERNAME = "VloStudios"
 GITHUB_API_URL = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 
 @app.route('/')
 def index():
-    root_index = os.path.join(app.root_path, 'index.html')
-    if os.path.exists(root_index):
-        return send_from_directory(app.root_path, 'index.html')
-    return send_from_directory(app.static_folder, 'index.html')
+    return send_from_directory(app.root_path, 'index.html')
 
 @app.route('/api/repos')
 def api_repos():
