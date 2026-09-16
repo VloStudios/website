@@ -2,11 +2,10 @@
 
 A developer portfolio site for Vlo, featuring:
 - Projects synced from GitHub (`VloStudios`)
-- Matrix-style background
-- Lo‑fi music player with selectable tracks
-- Cherry Clicker game (Japanese cherry vibes)
-- Chill, dark, hacker aesthetic
-- **Scrollable content** (fixed matrix background with scrolling foreground)
+- Sakura-themed CV presentation
+- Iced-tea-inspired design accents
+- Background ambient music toggle
+- **Scrollable card layout** with GitHub-powered profile/repo data
 
 ## Setup
 
@@ -28,18 +27,17 @@ A developer portfolio site for Vlo, featuring:
 
 ## Features
 
-- **Projects Tab**: Fetches public repositories from the GitHub user `VloStudios` and displays them as cards.
-- **Matrix Background**: Animated green code rain.
-- **Lo‑fi Player**: Choose from a few free lo‑fi tracks and play/pause.
-- **Cherry Clicker**: Japanese cherry‑themed clicker game with auto‑clickers and petal animations.
-- **Ice‑tea Mention**: Tagline references Vlo’s love for ice tea.
-- **Scrolling**: The content scrolls while the matrix background stays fixed.
+- **CV Snapshot**: Pulls profile details from `https://api.github.com/users/VloStudios`.
+- **Projects Section**: Fetches public repositories and displays the most recently updated.
+- **Sakura UI**: Soft pink card-based visuals with blossom-inspired background elements.
+- **Ambient Background Music**: Browser-based synth music with play/pause controls.
+- **Iced Tea Theme**: Dedicated section and palette accents for a calm tea vibe.
 
 ## Customization
 
-- Edit `static/js/lofi.js` to add or change lo‑fi track URLs.
+- Edit `static/js/main.js` to change profile username or CV rendering behavior.
 - Adjust styling in `static/css/style.css`.
-- Modify the Flask app in `app.py` if you need different GitHub user or additional data.
+- Modify the Flask app in `app.py` if you want server-rendered data endpoints.
 
 ## Deployment
 
