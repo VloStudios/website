@@ -10,7 +10,9 @@
   Pagina e publicată la https://vlostudios.dev/gpuinfo (fișierul gpuinfo/index.html din repo).
   O poți și încorpora în altă pagină cu
   <iframe src="/gpuinfo/" width="100%" height="640" style="border:0" allow="autoplay"></iframe>
-  Vocea folosește sinteza vocală a browserului (speechSynthesis), în limba română.
+  Vocea: fișiere MP3 în română din gpuinfo/audio/, generate o singură dată cu Piper TTS (modelul ro_RO-mihai-medium,
+  date CC0). Dacă un fișier lipsește sau textul unei propoziții a fost schimbat, pagina folosește vocea browserului
+  (speechSynthesis) sau doar subtitrări.
   Numele tău poate fi scris mai jos, în script, la constanta AUTOR.
 -->
 <style>
@@ -381,7 +383,7 @@ svg .hl{filter:drop-shadow(0 0 7px #ff8a3d) drop-shadow(0 0 2px #ff8a3d)}
         <div><b>✔</b><span>Poate fi integrată sau dedicată</span></div>
       </div>
       <p class="thanks" data-s="1">Mulțumesc!</p>
-      <div class="src" data-s="1">Surse: Wikipedia – „Graphics processing unit” și „Video card”.</div>
+      <div class="src" data-s="1">Surse: Wikipedia – „Graphics processing unit” și „Video card”. Voce: Piper TTS, model ro_RO-mihai (date CC0).</div>
     </section>
   </div>
 
@@ -571,6 +573,71 @@ var segs=SCENES.map(function(s,i){
   var b=document.createElement("button");b.className="seg";b.title=(i+1)+". "+s.name;b.setAttribute("aria-label","Scena "+(i+1)+": "+s.name);
   b.innerHTML="<span><i></i></span>";b.addEventListener("click",function(){go(i,0);});prog.appendChild(b);return b;});
 
+/* ===== Narațiune audio pregenerată (Piper, voce „Mihai”) – cheie = textul exact al propoziției ===== */
+var AUDIO = {
+ "Salut!": "audio/s0-0-0.mp3",
+ "Eu sunt Stickman, iar azi vă povestesc despre placa video.": "audio/s0-0-1.mp3",
+ "Este piesa din calculator care desenează tot ce vedem pe ecran: jocuri, filme și poze.": "audio/s0-1-0.mp3",
+ "Haideți să vedem din ce este făcută și cum funcționează!": "audio/s0-2-0.mp3",
+ "Placa video, numită și placă grafică, este componenta calculatorului care se ocupă de imagini.": "audio/s1-0-0.mp3",
+ "Cipul ei principal se numește GPU, adică unitate de procesare grafică.": "audio/s1-0-1.mp3",
+ "Ea primește de la procesor datele unui joc sau ale unui film și calculează culoarea fiecărui punct de pe ecran, numit pixel.": "audio/s1-1-0.mp3",
+ "Apoi trimite imaginea gata făcută la monitor, de zeci de ori pe secundă, ca mișcarea să pară fluidă.": "audio/s1-2-0.mp3",
+ "Să deschidem o placă video și să vedem ce are înăuntru.": "audio/s2-0-0.mp3",
+ "În mijloc este GPU-ul: cipul principal, creierul plăcii, care face toate calculele.": "audio/s2-1-0.mp3",
+ "În jurul lui sunt cipurile de memorie video, numite VRAM.": "audio/s2-2-0.mp3",
+ "Acolo se păstrează imaginea, texturile și rezultatele calculelor.": "audio/s2-2-1.mp3",
+ "Într-o parte este zona de alimentare, care transformă curentul de la sursă în cel de care are nevoie cipul.": "audio/s2-3-0.mp3",
+ "Placa primește curent prin conectorii de alimentare, iar prin slotul PCI Express se leagă de placa de bază.": "audio/s2-4-0.mp3",
+ "Un GPU puternic se încălzește mult, așa că deasupra lui se montează un radiator cu ventilatoare.": "audio/s2-5-0.mp3",
+ "La capătul plăcii sunt porturile HDMI și DisplayPort, de unde pleacă imaginea spre monitor.": "audio/s2-6-0.mp3",
+ "O placă video consumă multă energie.": "audio/s3-0-0.mp3",
+ "Din slotul PCI Express primește cel mult 75 de wați.": "audio/s3-0-1.mp3",
+ "Dacă are nevoie de mai mult, se leagă direct la sursa calculatorului.": "audio/s3-1-0.mp3",
+ "Un conector cu 6 pini dă 75 de wați, iar unul cu 8 pini dă 150.": "audio/s3-1-1.mp3",
+ "Plăcile de top pot consuma sute de wați.": "audio/s3-2-0.mp3",
+ "De exemplu, un model din 2018, RTX 2080 Ti, a avut în jocuri o medie de aproximativ 300.": "audio/s3-2-1.mp3",
+ "Aproape toată energia devine căldură, de aceea sunt necesare radiatoare și ventilatoare.": "audio/s3-2-2.mp3",
+ "Totul începe cu un joc sau un program care vrea să afișeze ceva.": "audio/s4-0-0.mp3",
+ "Procesorul, adică CPU, pregătește datele și le trimite către placa video.": "audio/s4-1-0.mp3",
+ "GPU-ul calculează forme, lumini și culori și pune imaginea gata făcută în memoria video.": "audio/s4-2-0.mp3",
+ "De acolo, imaginea pleacă prin HDMI sau DisplayPort spre monitor.": "audio/s4-3-0.mp3",
+ "Procesul se repetă de zeci de ori pe secundă.": "audio/s4-3-1.mp3",
+ "Procesorul are doar câteva nuclee, dar foarte puternice, bune la sarcini complicate.": "audio/s5-0-0.mp3",
+ "Placa video are sute sau chiar mii de nuclee mici, care lucrează toate în același timp.": "audio/s5-1-0.mp3",
+ "O imagine Full HD are peste două milioane de pixeli, iar fiecare poate fi calculat aproape independent.": "audio/s5-2-0.mp3",
+ "De aceea o armată de nuclee mici îi desenează mult mai repede.": "audio/s5-2-1.mp3",
+ "E ca diferența dintre un singur profesor foarte priceput și o clasă întreagă, în care fiecare elev rezolvă câte o problemă simplă, în același timp.": "audio/s5-3-0.mp3",
+ "Există două feluri de plăci video.": "audio/s6-0-0.mp3",
+ "Cea integrată face parte din procesor sau din placa de bază și folosește o parte din memoria RAM.": "audio/s6-0-1.mp3",
+ "Costă puțin și consumă puțin, dar este mai slabă.": "audio/s6-0-2.mp3",
+ "Placa dedicată este o piesă separată, cu propria memorie video, de tip GDDR.": "audio/s6-1-0.mp3",
+ "Costă mai mult și consumă mai multă energie, dar este mult mai puternică.": "audio/s6-1-1.mp3",
+ "Memoria unei plăci dedicate poate transfera peste o mie de gigaocteți pe secundă, iar la cea integrată ajunge la circa o sută douăzeci și opt.": "audio/s6-2-0.mp3",
+ "Pentru jocuri moderne și montaj video se alege, de obicei, o placă dedicată.": "audio/s6-2-1.mp3",
+ "Placa video are o istorie lungă.": "audio/s7-0-0.mp3",
+ "În 1981, cipul NEC μPD7220 a fost primul procesor grafic pe un singur cip pentru calculatoare personale.": "audio/s7-0-1.mp3",
+ "În 1994, firma Sony a folosit termenul GPU pentru cipul grafic al consolei PlayStation.": "audio/s7-1-0.mp3",
+ "În 2002, placa Radeon 9700 de la ATI a adus shadere programabile, adică programe mici care schimbă felul în care sunt desenate luminile și culorile.": "audio/s7-2-0.mp3",
+ "În 2007, NVIDIA a lansat CUDA, care a permis folosirea plăcilor video și pentru alte calcule, nu doar pentru imagini.": "audio/s7-3-0.mp3",
+ "În 2018, seria RTX 20 a adus nuclee speciale pentru ray tracing, adică lumini și reflexii realiste calculate în timp real, plus nuclee pentru inteligență artificială.": "audio/s7-4-0.mp3",
+ "Placa video se folosește la jocuri, la montaj video și la modelare 3D.": "audio/s8-0-0.mp3",
+ "Dar și la inteligență artificială, la simulări științifice și chiar la minat de criptomonede.": "audio/s8-1-0.mp3",
+ "Cei trei mari producători sunt NVIDIA, AMD și Intel.": "audio/s8-2-0.mp3",
+ "Pe scurt: placa video desenează imaginile pe care le vedem, are un GPU, memorie video și răcire, iar mii de nuclee lucrează în paralel.": "audio/s9-0-0.mp3",
+ "Vă mulțumesc pentru atenție!": "audio/s9-1-0.mp3",
+ "Aveți întrebări?": "audio/s9-1-1.mp3"
+};
+var HAS_AUDIO = Object.keys(AUDIO).length > 0;
+var player = new Audio(); player.preload = "auto";   // un singur element, „deblocat” de primul click
+var BLOBS = {};
+function warmAudio(){   // descarcă toate clipurile în memorie, ca redarea să pornească fără așteptare
+  if(!window.fetch||!window.URL)return;
+  var list=Object.keys(AUDIO).map(function(k){return AUDIO[k];}), i=0;
+  (function nx(){ if(i>=list.length)return; var u=list[i++];
+    fetch(u).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(b){ BLOBS[u]=URL.createObjectURL(b); }).catch(function(){}).then(function(){ setTimeout(nx,20); }); })();
+}
+
 /* ===== Voce ===== */
 var synth=("speechSynthesis" in window)?window.speechSynthesis:null;
 var roVoices=[], voice=null, voiceOn=true;
@@ -584,12 +651,13 @@ function loadVoices(){
     if(!voice||roVoices.indexOf(voice)<0) voice=roVoices[0];
     sel.innerHTML=roVoices.map(function(v,i){return '<option value="'+i+'">'+v.name.replace(/</g,"")+'</option>';}).join("");
     sel.value=String(roVoices.indexOf(voice));
-    sel.classList.toggle("show",roVoices.length>1);
+    sel.classList.toggle("show",roVoices.length>1&&!HAS_AUDIO);
   } else { voice=null; sel.classList.remove("show"); }
   updateVstat();
 }
 function updateVstat(){
   var el=$("gpVstat");
+  if(HAS_AUDIO){el.className="gp-vstat";el.innerHTML="🔊 Narațiune audio în română (voce AI), încărcată împreună cu pagina.";return;}
   if(voice){el.className="gp-vstat";el.innerHTML="🔊 Voce în română găsită: <b>"+voice.name.replace(/</g,"")+"</b>";}
   else{el.className="gp-vstat warn";el.innerHTML="⚠ <b>Nu am găsit o voce în română pe acest dispozitiv.</b> Prezentarea rulează cu subtitrări. Pe calculator încearcă Microsoft Edge (are voci românești naturale), iar pe telefon browserul implicit.";}
 }
@@ -623,19 +691,42 @@ function stop(){
 }
 function speakOne(text,done){
   var fin=false, wd=null, sp=null, est=Math.max(1800,text.length*68+500);
-  function end(){ if(fin)return; fin=true; clearTimeout(wd); clearTimeout(sp); cancelCur=null; done(); }
-  cancelCur=function(){fin=true;clearTimeout(wd);clearTimeout(sp);try{if(synth)synth.cancel();}catch(e){}};
-  if(voiceOn&&voice&&synth){
+  function detach(){ player.onended=null; player.onerror=null; }
+  function end(){ if(fin)return; fin=true; clearTimeout(wd); clearTimeout(sp); detach(); cancelCur=null; done(); }
+  cancelCur=function(){fin=true;clearTimeout(wd);clearTimeout(sp);detach();try{player.pause();}catch(e){}try{if(synth)synth.cancel();}catch(e){}};
+  function viaBrowser(){   // rezervă: vocea browserului, apoi doar subtitrări cu timp estimat
+    if(fin)return;
+    clearTimeout(wd);
+    if(voiceOn&&voice&&synth){
+      try{
+        var u=new SpeechSynthesisUtterance(text);
+        u.voice=voice;u.lang=voice.lang||"ro-RO";u.rate=.96;u.pitch=1;
+        u.onend=end;u.onerror=end;
+        sp=setTimeout(function(){ if(!fin){ try{synth.speak(u);}catch(e){end();} } },120);
+        wd=setTimeout(end,est*2.2+4000);
+        return;
+      }catch(e){}
+    }
+    wd=setTimeout(end,est);
+  }
+  var src=AUDIO[text];
+  if(voiceOn&&src){
     try{
-      var u=new SpeechSynthesisUtterance(text);
-      u.voice=voice;u.lang=voice.lang||"ro-RO";u.rate=.96;u.pitch=1;
-      u.onend=end;u.onerror=end;
-      sp=setTimeout(function(){ if(!fin){ try{synth.speak(u);}catch(e){end();} } },120);
-      wd=setTimeout(end,est*2.2+4000);
+      var triedNet=!BLOBS[src];
+      player.onended=end;
+      player.onerror=function(){
+        if(fin)return;
+        if(!triedNet){ triedNet=true; BLOBS[src]=null; try{player.src=src;player.play();}catch(e){detach();viaBrowser();} return; }
+        detach(); viaBrowser();
+      };
+      player.src=BLOBS[src]||src;
+      var pr=player.play();
+      if(pr&&pr.catch){ pr.catch(function(){ if(fin)return; detach(); viaBrowser(); }); }
+      wd=setTimeout(function(){ if(fin)return; detach(); try{player.pause();}catch(e){} viaBrowser(); },est*2.2+4000);
       return;
     }catch(e){}
   }
-  wd=setTimeout(end,est);
+  viaBrowser();
 }
 function runStep(){
   stop(); var my=token; render();
@@ -687,6 +778,7 @@ document.addEventListener("keydown",function(e){
 });
 window.addEventListener("pagehide",function(){stop();});
 
+setTimeout(warmAudio,600);
 // prima randare (static, în spatele ecranului de start)
 render(); showSub(SCENES[0].steps[0].t);
 window.gpPlayer={go:go,play:play,pause:pause,scenes:SCENES};
