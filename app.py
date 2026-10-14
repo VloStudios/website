@@ -10,6 +10,12 @@ GITHUB_API_URL = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 def index():
     return send_from_directory(app.root_path, 'index.html')
 
+@app.route('/gpuinfo')
+@app.route('/gpuinfo/')
+def gpuinfo():
+    # Matches GitHub Pages, where gpuinfo/index.html is served at /gpuinfo
+    return send_from_directory(app.root_path + '/gpuinfo', 'index.html')
+
 @app.route('/<path:filename>')
 def static_files(filename):
     # Only serve the public site assets (never .git, app.py, etc.)
