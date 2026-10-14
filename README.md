@@ -18,8 +18,8 @@ This repository now contains a full static-first remake of the site with a brand
 ## Run locally
 
 ```bash
-pip install -r /home/runner/work/website/website/requirements.txt
-python /home/runner/work/website/website/app.py
+pip install -r requirements.txt
+python app.py
 ```
 
 Then open `http://localhost:5001`.
