@@ -13,8 +13,6 @@
   Vocea: fișiere MP3 în română din gpuinfo/audio/, generate o singură dată cu Piper TTS (modelul ro_RO-mihai-medium,
   date CC0). Dacă un fișier lipsește sau textul unei propoziții a fost schimbat, pagina folosește vocea browserului
   (speechSynthesis) sau doar subtitrări.
-  Limba: /gpuinfo (sau ?lang=ro) = română, /gpuinfo?lang=en = engleză. Audio englezesc: gpuinfo/audio/en/ (Piper TTS,
-  modelul en_US-joe-medium, date CC0).
   Numele tău poate fi scris mai jos, în script, la constanta AUTOR.
 -->
 <style>
@@ -199,11 +197,6 @@ svg .hl{filter:drop-shadow(0 0 7px #ff8a3d) drop-shadow(0 0 2px #ff8a3d)}
 .gp-start:hover{transform:scale(1.05)}
 .gp-start:focus-visible{outline:.15em solid var(--cy);outline-offset:.2em}
 .gp-start svg{width:1em;height:1em;fill:currentColor}
-.gp-lang{display:flex;gap:.6em;font-size:1.4em}
-.gp-lang a{all:unset;cursor:pointer;padding:.3em .9em;border-radius:2em;border:1px solid var(--line);color:#c9d6ee;background:rgba(23,32,51,.7);font-weight:600}
-.gp-lang a:hover{background:#2a3b5c}.gp-lang a[aria-current]{background:var(--cy);color:#06222b;border-color:transparent}
-.gp-lang a:focus-visible,.gp-langbtn:focus-visible{outline:.2em solid var(--cy);outline-offset:.15em}
-.gp-langbtn{font-size:1.15em;font-weight:800;letter-spacing:.02em;text-decoration:none}
 .gp-vstat{font-size:1.45em;color:var(--mut);max-width:30em;line-height:1.4}
 .gp-vstat b{color:var(--gr)}.gp-vstat.warn b{color:#ffcf5c}
 
@@ -419,7 +412,6 @@ svg .hl{filter:drop-shadow(0 0 7px #ff8a3d) drop-shadow(0 0 2px #ff8a3d)}
     <button class="gp-btn big" id="gpPlay" title="Redare / pauză" aria-label="Redare sau pauză"><svg id="gpIcoPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg id="gpIcoPause" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
     <button class="gp-btn" id="gpNext" title="Scena următoare" aria-label="Scena următoare"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
     <div class="gp-prog" id="gpProg"></div>
-    <a class="gp-btn gp-langbtn" id="gpLangBtn" href="?lang=en" hreflang="en" title="English" aria-label="English">EN</a>
     <select class="gp-sel" id="gpVoiceSel" aria-label="Alege vocea"></select>
     <button class="gp-btn" id="gpVoice" title="Voce pornită / oprită" aria-label="Voce pornită sau oprită"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path class="wv" d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="sl" d="M4 4l16 16"/></svg></button>
   </div>
@@ -428,7 +420,6 @@ svg .hl{filter:drop-shadow(0 0 7px #ff8a3d) drop-shadow(0 0 2px #ff8a3d)}
     <h3 id="gpOverTitle">Placa video</h3>
     <button class="gp-start" id="gpStart"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span id="gpStartTxt">Pornește prezentarea</span></button>
     <div class="gp-vstat" id="gpVstat"></div>
-    <div class="gp-lang" id="gpLang"><a href="?lang=ro" hreflang="ro">Română</a><a href="?lang=en" hreflang="en">English</a></div>
   </div>
 
 </div>
@@ -439,13 +430,6 @@ svg .hl{filter:drop-shadow(0 0 7px #ff8a3d) drop-shadow(0 0 2px #ff8a3d)}
 <script>
 (function(){
 "use strict";
-/* Limba: ?lang=ro (implicit) sau ?lang=en */
-var LANG=(function(){try{var l=(new URLSearchParams(location.search).get("lang")||"").toLowerCase().slice(0,2);return l==="en"?"en":"ro";}catch(e){return "ro";}})();
-var EN={"names": ["Introduction", "What is it?", "Components", "Power", "How it works", "CPU and GPU", "Integrated or dedicated", "History", "Uses", "Conclusion"], "steps": [["Hi! I'm Stickman, and today I'm going to tell you about the graphics card.", "It's the part of the computer that draws everything we see on the screen: games, movies and pictures.", "Let's see what it's made of and how it works!"], ["The graphics card, also called a video card, is the part of the computer that handles images. Its main chip is called the GPU, short for graphics processing unit.", "It receives the data of a game or a movie from the processor and works out the color of every dot on the screen, called a pixel.", "Then it sends the finished image to the monitor, dozens of times every second, so the motion looks smooth."], ["Let's open up a graphics card and see what's inside.", "In the middle is the GPU: the main chip, the brain of the card, which does all the calculations.", "Around it are the video memory chips, called VRAM. This is where the image, the textures and the results of the calculations are kept.", "On one side is the power section, which turns the current from the power supply into the kind the chip needs.", "The card gets power through the power connectors, and it plugs into the motherboard through the PCI Express slot.", "A powerful GPU gets very hot, so a heatsink with fans is mounted on top of it.", "At the end of the card are the HDMI and DisplayPort ports, where the image leaves for the monitor."], ["A graphics card uses a lot of power. From the PCI Express slot it can draw at most 75 watts.", "If it needs more, it connects straight to the computer's power supply. A 6-pin connector gives 75 watts, and an 8-pin one gives 150.", "Top cards can use hundreds of watts. For example, a model from 2018, the RTX 2080 Ti, averaged about 300 in games. Almost all of that energy turns into heat, which is why heatsinks and fans are needed."], ["It all starts with a game or a program that wants to show something.", "The processor, the CPU, prepares the data and sends it to the graphics card.", "The GPU works out shapes, lights and colors, and puts the finished image into the video memory.", "From there, the image goes through HDMI or DisplayPort to the monitor. The process repeats dozens of times a second."], ["The processor has only a few cores, but very powerful ones, good at complicated tasks.", "The graphics card has hundreds or even thousands of small cores, all working at the same time.", "A Full HD image has over two million pixels, and each one can be calculated almost independently. That's why an army of small cores draws it much faster.", "It's like the difference between one very skilled teacher and a whole class, where every student solves one simple problem at the same time."], ["There are two kinds of graphics cards. The integrated one is part of the processor or the motherboard, and it uses some of the computer's RAM. It costs little and uses little power, but it is weaker.", "The dedicated card is a separate part, with its own video memory, of the GDDR type. It costs more and uses more power, but it is much more powerful.", "The memory of a dedicated card can transfer over a thousand gigabytes per second, while the integrated one reaches about one hundred and twenty-eight. For modern games and video editing, people usually choose a dedicated card."], ["The graphics card has a long history. In 1981, the NEC μPD7220 chip was the first single-chip graphics processor for personal computers.", "In 1994, Sony used the term GPU for the graphics chip of the PlayStation console.", "In 2002, the Radeon 9700 card from ATI brought programmable shaders, which are small programs that change how lights and colors are drawn.", "In 2007, NVIDIA released CUDA, which allowed graphics cards to be used for other calculations too, not just for images.", "In 2018, the RTX 20 series brought special cores for ray tracing, which means realistic lights and reflections calculated in real time, plus cores for artificial intelligence."], ["The graphics card is used for games, video editing and 3D modeling.", "But also for artificial intelligence, scientific simulations and even cryptocurrency mining.", "The three big makers are NVIDIA, AMD and Intel."], ["In short: the graphics card draws the images we see, it has a GPU, video memory and cooling, and thousands of cores work in parallel.", "Thank you for your attention! Any questions?"]], "dom": {"Proiect la informatică": "Computer science project", "Placa video": "Graphics card", "GPU – „creierul” imaginilor din calculator": "GPU – the “brain” of the images on a computer", "Să începem": "Let's begin", "Ce este placa video?": "What is a graphics card?", "Procesor": "Processor", "Pe dinăuntru": "On the inside", "Din ce este făcută?": "What is it made of?", "Energie": "Power", "Curent și căldură": "Electricity and heat", "Slotul PCI Express": "PCI Express slot", "până la 75 W": "up to 75 W", "Conector cu 6 pini": "6-pin connector", "Conector cu 8 pini": "8-pin connector", "Placă de top (în jocuri)": "Top card (in games)", "🔥 Aproape toată energia se transformă în căldură – de aceea sunt necesare radiatoare și ventilatoare.": "🔥 Almost all the energy turns into heat – that's why heatsinks and fans are needed.", "Pas cu pas": "Step by step", "Cum ajunge imaginea pe ecran?": "How does the image get on the screen?", "Jocul": "The game", "sau programul": "or program", "Procesorul": "The processor", "GPU calculează": "GPU calculates", "Memoria": "Video", "video (VRAM)": "memory (VRAM)", "Monitorul": "The monitor", "↻ de ~60 de ori pe secundă": "↻ about 60 times per second", "Diferența": "The difference", "Procesor sau placă video?": "Processor or graphics card?", "câteva nuclee foarte puternice": "a few very powerful cores", "sute sau mii de nuclee mici": "hundreds or thousands of small cores", "Două feluri": "Two kinds", "Integrată sau dedicată?": "Integrated or dedicated?", "Integrată": "Integrated", "Dedicată": "Dedicated", "face parte din procesor sau din placa de bază": "part of the processor or the motherboard", "folosește o parte din memoria RAM": "uses some of the RAM", "ieftină, consum mic": "cheap, low power use", "piesă separată, pusă în slot": "a separate part, plugged into a slot", "are propria memorie video (GDDR)": "has its own video memory (GDDR)", "mult mai puternică, dar mai scumpă": "much more powerful, but more expensive", "Viteza memoriei:": "Memory speed:", "circa 128 GB/s": "about 128 GB/s", "peste 1000 GB/s": "over 1000 GB/s", "Puțină istorie": "A bit of history", "Cum a evoluat?": "How has it evolved?", "primul procesor grafic pe un singur cip pentru PC (NEC μPD7220)": "first single-chip graphics processor for PCs (NEC μPD7220)", "termenul „GPU” apare la Sony, pentru PlayStation": "the term “GPU” appears at Sony, for the PlayStation", "shadere programabile (ATI Radeon 9700)": "programmable shaders (ATI Radeon 9700)", "CUDA: calcule pe GPU (NVIDIA)": "CUDA: computing on the GPU (NVIDIA)", "ray tracing în timp real (seria RTX 20)": "real-time ray tracing (RTX 20 series)", "La ce folosește": "What it's used for", "Utilizări și producători": "Uses and makers", "Jocuri": "Games", "Montaj video": "Video editing", "Modelare 3D": "3D modeling", "Inteligență artificială": "Artificial intelligence", "Cercetare științifică": "Scientific research", "Minat de criptomonede": "Cryptocurrency mining", "Producători principali:": "Main makers:", "Pe scurt": "In short", "Ce am învățat": "What we learned", "Placa video desenează imaginile pe care le vedem": "The graphics card draws the images we see", "Are GPU, memorie video, alimentare și răcire": "It has a GPU, video memory, power and cooling", "Mii de nuclee lucrează în paralel": "Thousands of cores work in parallel", "Poate fi integrată sau dedicată": "It can be integrated or dedicated", "Mulțumesc!": "Thank you!", "Surse: Wikipedia – „Graphics processing unit” și „Video card”. Voce: Piper TTS, model ro_RO-mihai (date CC0).": "Sources: Wikipedia – “Graphics processing unit” and “Video card”. Voice: Piper TTS, model en_US-joe (CC0 data).", "Alimentare": "Power", "Conector de alimentare": "Power connector", "Slot PCI Express (spre placa de bază)": "PCI Express slot (to the motherboard)", "Radiator + ventilatoare": "Heatsink + fans", "Porturi HDMI / DisplayPort": "HDMI / DisplayPort ports", "Pornește prezentarea": "Start the presentation", "Procesorul trimite date către placa video, iar aceasta trimite imaginea la monitor": "The processor sends data to the graphics card, which sends the image to the monitor", "Lanțul de la program la monitor": "The chain from program to monitor", "Placa video văzută de sus, cu componentele marcate": "Graphics card seen from above, with the components labeled", "Scena anterioară": "Previous scene", "Redare / pauză": "Play / pause", "Redare sau pauză": "Play or pause", "Scena următoare": "Next scene", "Alege vocea": "Choose voice", "Voce pornită / oprită": "Voice on / off", "Voce pornită sau oprită": "Voice on or off"}, "analogy": "🧑‍🏫 <b>one brilliant teacher</b> &nbsp;or&nbsp; 🧑‍🎓🧑‍🎓🧑‍🎓 <b>a whole class</b>", "ui": {"audio": "🔊 Audio narration in English (AI voice), loaded together with the page.", "found": "🔊 English voice found: <b>%s</b>", "warn": "⚠ <b>No English voice found on this device.</b> The presentation will run with subtitles only.", "done": "Done! 🎉", "again": "Watch again", "scene": "Scene", "by": "Presented by: ", "title": "Graphics card – animated presentation"}};
-var UI_RO={audio:"🔊 Narațiune audio în română (voce AI), încărcată împreună cu pagina.",found:"🔊 Voce în română găsită: <b>%s</b>",
-  warn:"⚠ <b>Nu am găsit o voce în română pe acest dispozitiv.</b> Prezentarea rulează cu subtitrări. Pe calculator încearcă Microsoft Edge (are voci românești naturale), iar pe telefon browserul implicit.",
-  done:"Gata! 🎉",again:"Vezi din nou",scene:"Scena",by:"Prezentat de: "};
-var UI=(LANG==="en")?EN.ui:UI_RO;
 
 /* ===== Setări ===== */
 var AUTOR = "";   // scrie aici numele tău, ex.: "Ana Popescu, clasa a 9-a"
@@ -500,7 +484,6 @@ var SCENES = [
   {p:"explain",t:"Pe scurt: placa video desenează imaginile pe care le vedem, are un GPU, memorie video și răcire, iar mii de nuclee lucrează în paralel."},
   {p:"cheer",  t:"Vă mulțumesc pentru atenție! Aveți întrebări?"}]}
 ];
-if(LANG==="en"){ SCENES.forEach(function(sc,i){ sc.name=EN.names[i]; sc.steps.forEach(function(st,j){ st.t=EN.steps[i][j]; }); }); }
 
 /* ===== Desenele refolosite (SVG) ===== */
 function fan(cx,cy,r,col){
@@ -574,24 +557,11 @@ var st=document.createElement("style");
 st.textContent=".cooler{transform:translateY(-34px)!important}.cooler.in{transform:none!important}.cooler{opacity:0}.cooler.in{opacity:1}";
 document.head.appendChild(st);
 
-// versiunea în engleză: traduce textele din pagină (noduri text + title/aria-label)
-if(LANG==="en"){(function(){
-  var root=document.getElementById("gp"), map=EN.dom, i;
-  var an=root.querySelector(".analogy"); if(an) an.innerHTML=EN.analogy;
-  var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null), n, list=[];
-  while((n=w.nextNode())) list.push(n);
-  list.forEach(function(t){ var m=t.nodeValue.match(/^(\s*)([\s\S]*?)(\s*)$/);
-    if(m[2]&&map.hasOwnProperty(m[2])) t.nodeValue=m[1]+map[m[2]]+m[3]; });
-  var els=root.querySelectorAll("[title],[aria-label]");
-  for(i=0;i<els.length;i++){ ["title","aria-label"].forEach(function(a){ var v=els[i].getAttribute(a); if(v&&map.hasOwnProperty(v)) els[i].setAttribute(a,map[v]); }); }
-  document.documentElement.lang="en"; document.title=EN.ui.title;
-})();}
-
 // grid GPU cores
 (function(){var g=document.getElementById("gpGrid"),h="";
   for(var i=0;i<80;i++){var d=((i%16)*38+Math.floor(i/16)*70+(i*13%7)*14);h+='<i class="cell" style="--d:'+d+'ms"></i>';}
   g.innerHTML=h;})();
-if(AUTOR){document.getElementById("gpBy").textContent=UI.by+AUTOR;}
+if(AUTOR){document.getElementById("gpBy").textContent="Prezentat de: "+AUTOR;}
 
 /* ===== Elemente ===== */
 function $(id){return document.getElementById(id);}
@@ -600,11 +570,11 @@ var scEls=SCENES.map(function(s,i){return $("sc"+i);});
 
 /* ===== Progres ===== */
 var segs=SCENES.map(function(s,i){
-  var b=document.createElement("button");b.className="seg";b.title=(i+1)+". "+s.name;b.setAttribute("aria-label",UI.scene+" "+(i+1)+": "+s.name);
+  var b=document.createElement("button");b.className="seg";b.title=(i+1)+". "+s.name;b.setAttribute("aria-label","Scena "+(i+1)+": "+s.name);
   b.innerHTML="<span><i></i></span>";b.addEventListener("click",function(){go(i,0);});prog.appendChild(b);return b;});
 
 /* ===== Narațiune audio pregenerată (Piper, voce „Mihai”) – cheie = textul exact al propoziției ===== */
-var AUDIO_RO = {
+var AUDIO = {
  "Salut!": "audio/s0-0-0.mp3",
  "Eu sunt Stickman, iar azi vă povestesc despre placa video.": "audio/s0-0-1.mp3",
  "Este piesa din calculator care desenează tot ce vedem pe ecran: jocuri, filme și poze.": "audio/s0-1-0.mp3",
@@ -658,8 +628,6 @@ var AUDIO_RO = {
  "Vă mulțumesc pentru atenție!": "audio/s9-1-0.mp3",
  "Aveți întrebări?": "audio/s9-1-1.mp3"
 };
-var AUDIO = AUDIO_RO;
-if(LANG==="en"){ AUDIO={}; EN.steps.forEach(function(sc,i){ sc.forEach(function(t,j){ splitS(t).forEach(function(x,k){ AUDIO[x]="audio/en/s"+i+"-"+j+"-"+k+".mp3"; }); }); }); }
 var HAS_AUDIO = Object.keys(AUDIO).length > 0;
 var player = new Audio(); player.preload = "auto";   // un singur element, „deblocat” de primul click
 var BLOBS = {};
@@ -673,12 +641,11 @@ function warmAudio(){   // descarcă toate clipurile în memorie, ca redarea să
 /* ===== Voce ===== */
 var synth=("speechSynthesis" in window)?window.speechSynthesis:null;
 var roVoices=[], voice=null, voiceOn=true;
-var VRE=(LANG==="en")?/^en([-_]|$)/i:/^ro([-_]|$)/i, VDEF=(LANG==="en")?"en-US":"ro-RO";
 function scoreV(v){var n=(v.name||"").toLowerCase(),s=0;
   if(/natural|online|neural/.test(n))s+=10; if(/google/.test(n))s+=5; if(/microsoft/.test(n))s+=3; if(v.localService===false)s+=1; return s;}
 function loadVoices(){
   if(!synth)return;
-  roVoices=synth.getVoices().filter(function(v){return VRE.test(v.lang||"");}).sort(function(a,b){return scoreV(b)-scoreV(a);});
+  roVoices=synth.getVoices().filter(function(v){return /^ro([-_]|$)/i.test(v.lang||"");}).sort(function(a,b){return scoreV(b)-scoreV(a);});
   var sel=$("gpVoiceSel");
   if(roVoices.length){
     if(!voice||roVoices.indexOf(voice)<0) voice=roVoices[0];
@@ -690,9 +657,9 @@ function loadVoices(){
 }
 function updateVstat(){
   var el=$("gpVstat");
-  if(HAS_AUDIO){el.className="gp-vstat";el.innerHTML=UI.audio;return;}
-  if(voice){el.className="gp-vstat";el.innerHTML=UI.found.replace("%s",voice.name.replace(/</g,""));}
-  else{el.className="gp-vstat warn";el.innerHTML=UI.warn;}
+  if(HAS_AUDIO){el.className="gp-vstat";el.innerHTML="🔊 Narațiune audio în română (voce AI), încărcată împreună cu pagina.";return;}
+  if(voice){el.className="gp-vstat";el.innerHTML="🔊 Voce în română găsită: <b>"+voice.name.replace(/</g,"")+"</b>";}
+  else{el.className="gp-vstat warn";el.innerHTML="⚠ <b>Nu am găsit o voce în română pe acest dispozitiv.</b> Prezentarea rulează cu subtitrări. Pe calculator încearcă Microsoft Edge (are voci românești naturale), iar pe telefon browserul implicit.";}
 }
 if(synth){loadVoices(); if("onvoiceschanged" in synth) synth.onvoiceschanged=loadVoices; setTimeout(loadVoices,600);} else {updateVstat();}
 $("gpVoiceSel").addEventListener("change",function(e){voice=roVoices[+e.target.value]||voice;updateVstat();if(playing)restartStep();});
@@ -733,7 +700,7 @@ function speakOne(text,done){
     if(voiceOn&&voice&&synth){
       try{
         var u=new SpeechSynthesisUtterance(text);
-        u.voice=voice;u.lang=voice.lang||VDEF;u.rate=.96;u.pitch=1;
+        u.voice=voice;u.lang=voice.lang||"ro-RO";u.rate=.96;u.pitch=1;
         u.onend=end;u.onerror=end;
         sp=setTimeout(function(){ if(!fin){ try{synth.speak(u);}catch(e){end();} } },120);
         wd=setTimeout(end,est*2.2+4000);
@@ -778,7 +745,7 @@ function advance(){
 }
 function finish(){
   stop(); playing=false; gp.classList.remove("playing");
-  $("gpOverTitle").textContent=UI.done; $("gpStartTxt").textContent=UI.again;
+  $("gpOverTitle").textContent="Gata! 🎉"; $("gpStartTxt").textContent="Vezi din nou";
   $("gpOver").classList.remove("hide");
   started=false; si=0; ti=0;
 }
@@ -811,13 +778,6 @@ document.addEventListener("keydown",function(e){
 });
 window.addEventListener("pagehide",function(){stop();});
 
-(function(){ // selector de limbă
-  var as=document.querySelectorAll("#gpLang a");
-  for(var i=0;i<as.length;i++){ if(as[i].getAttribute("hreflang")===LANG) as[i].setAttribute("aria-current","true"); }
-  var b=$("gpLangBtn"), o=(LANG==="en")?"ro":"en";
-  b.href="?lang="+o; b.setAttribute("hreflang",o); b.textContent=o.toUpperCase();
-  var nm=(o==="ro")?"Română":"English"; b.title=nm; b.setAttribute("aria-label",nm);
-})();
 setTimeout(warmAudio,600);
 // prima randare (static, în spatele ecranului de start)
 render(); showSub(SCENES[0].steps[0].t);
