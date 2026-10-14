@@ -16,10 +16,6 @@ def gpuinfo():
     # Matches GitHub Pages, where gpuinfo/index.html is served at /gpuinfo
     return send_from_directory(app.root_path + '/gpuinfo', 'index.html')
 
-@app.route('/gpuinfo/audio/<path:filename>')
-def gpuinfo_audio(filename):
-    return send_from_directory(app.root_path + '/gpuinfo/audio', filename)
-
 @app.route('/<path:filename>')
 def static_files(filename):
     # Only serve the public site assets (never .git, app.py, etc.)
