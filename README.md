@@ -12,6 +12,7 @@ This repository now contains a full static-first remake of the site with a brand
 - `/index.html` — primary site entrypoint
 - `/css/style.css` — complete redesign styles
 - `/js/main.js` — animation + GitHub data loading + CV/repo rendering
+- `/gpuinfo/index.html` — animated graphics card (GPU) presentation, served at `/gpuinfo`
 - `/404.html` — custom Sakura iced-tea 404 page
 - `/app.py` — optional local Flask serving
 
