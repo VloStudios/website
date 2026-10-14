@@ -1,7 +1,7 @@
 from flask import Flask, send_from_directory, jsonify
 import requests
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__, static_folder=None)
 
 GITHUB_USERNAME = "VloStudios"
 GITHUB_API_URL = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
@@ -9,6 +9,13 @@ GITHUB_API_URL = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 @app.route('/')
 def index():
     return send_from_directory(app.root_path, 'index.html')
+
+@app.route('/<path:filename>')
+def static_files(filename):
+    # Only serve the public site assets (never .git, app.py, etc.)
+    if filename in ('404.html', 'index.html') or filename.startswith(('css/', 'js/')):
+        return send_from_directory(app.root_path, filename)
+    return send_from_directory(app.root_path, '404.html'), 404
 
 @app.route('/api/repos')
 def api_repos():
@@ -34,4 +41,4 @@ def api_repos():
         return jsonify([])
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=False, host='0.0.0.0', port=5001)

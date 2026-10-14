@@ -33,7 +33,8 @@ function formatDate(iso) {
 }
 
 function makeRain() {
-  const symbols = ["🧋", "🌸", "💧"];
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const symbols = ["🧋", "🌸", "💧", "✨"];
   const count = 36;
 
   for (let i = 0; i < count; i += 1) {
@@ -105,14 +106,14 @@ async function loadData() {
     profile = await profileRes.json();
     repos = await reposRes.json();
   } catch {
-    ui.bio.textContent = "Could not fetch GitHub live data right now, but the tea vibes remain immaculate.";
+    ui.bio.textContent = "Could not fetch GitHub live data right now, but the tea vibes remain immaculate. ☕";
     ui.username.textContent = user;
     ui.location.textContent = "Internet";
     ui.followers.textContent = "-";
     ui.reposCount.textContent = "-";
     ui.topLanguages.textContent = "-";
     ui.updated.textContent = "Unavailable";
-    ui.repoGrid.innerHTML = '<p class="muted">Unable to load repositories currently.</p>';
+    ui.repoGrid.innerHTML = `<p class="muted">Couldn't load repositories (GitHub may be rate-limiting). <a href="https://github.com/${user}" target="_blank" rel="noreferrer">Visit the GitHub profile instead 🌸</a></p>`;
     return;
   }
 
@@ -128,6 +129,12 @@ async function loadData() {
 
   renderRepos(repos);
 }
+
+const mascot = document.getElementById("mascot");
+const petals = ["🌸", "💖", "✨", "🧋"];
+mascot?.addEventListener("click", () => {
+  mascot.textContent = petals[Math.floor(Math.random() * petals.length)];
+});
 
 makeRain();
 loadData();
