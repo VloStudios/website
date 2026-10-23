@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>your name</title>
+  <meta name="description" content="personal corner of the internet. software, linux, and half-finished experiments.">
+  <meta name="color-scheme" content="dark light">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="your name">
+  <meta property="og:description" content="personal corner of the internet. software, linux, and half-finished experiments.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">skip to content</a>
+
+  <header class="site-header">
+    <a class="wordmark" href="#home" id="wordmark">~/you</a>
+    <nav aria-label="main">
+      <ul>
+        <li><a href="#home">home</a></li>
+        <li><a href="#projects">projects</a></li>
+        <li><a href="#about">about</a></li>
+        <li><a href="#contact">contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="home" aria-labelledby="home-title">
+      <h1 id="home-title">hi.</h1>
+      <div id="intro" class="prose"></div>
+      <noscript><p>this page fills itself in with javascript. sorry, it's a small site and i got lazy about it.</p></noscript>
+    </section>
+
+    <section id="projects" aria-labelledby="projects-title">
+      <h2 id="projects-title">projects</h2>
+      <ul id="project-list" class="projects"></ul>
+    </section>
+
+    <section id="about" aria-labelledby="about-title">
+      <h2 id="about-title">about</h2>
+      <div id="about-text" class="prose"></div>
+      <dl id="uses" class="uses"></dl>
+    </section>
+
+    <section id="now" aria-labelledby="now-title" hidden>
+      <h2 id="now-title">currently</h2>
+      <ul id="now-list" class="now"></ul>
+    </section>
+
+    <section id="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title">contact</h2>
+      <ul id="contact-list" class="contact"></ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span id="footer-text"></span>
+  </footer>
+
+  <script src="site.config.js"></script>
+  <script src="js/main.js"></script>
+  <!-- why is this even working -->
+</body>
+</html>
