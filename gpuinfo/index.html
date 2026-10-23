@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Placa video – prezentare animată</title>
+<!--
+  PLACA VIDEO – prezentare animată cu stickman
+  Un singur fișier: HTML + CSS + JavaScript, fără biblioteci externe.
+  Pagina e publicată la https://vlostudios.dev/gpuinfo (fișierul gpuinfo/index.html din repo).
+  O poți și încorpora în altă pagină cu
+  <iframe src="/gpuinfo/" width="100%" height="640" style="border:0" allow="autoplay"></iframe>
+  Vocea: fișiere MP3 în română din gpuinfo/audio/, generate o singură dată cu Piper TTS (modelul ro_RO-mihai-medium,
+  date CC0). Dacă un fișier lipsește sau textul unei propoziții a fost schimbat, pagina folosește vocea browserului
+  (speechSynthesis) sau doar subtitrări.
+  Numele tău poate fi scris mai jos, în script, la constanta AUTOR.
+-->
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#080b12;font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:#eef2f8;min-height:100vh;display:grid;place-items:center;padding:16px}
+
+.gp{--bg:#0e1420;--panel:#172033;--panel2:#1d2940;--line:#2a3957;--txt:#eef2f8;--mut:#9fb0c9;--acc:#ff8a3d;--cy:#35d0ff;--gr:#4ade80;--pk:#ff4d8d;
+  width:min(100%,1100px);container-type:inline-size}
+.gp-stage{position:relative;overflow:hidden;aspect-ratio:16/9;font-size:1.05cqw;border-radius:1.6em;border:1px solid #26334d;
+  background:radial-gradient(120% 100% at 72% 0%,#1d2a45 0%,#0e1420 62%);box-shadow:0 1.6em 5em rgba(0,0,0,.55);color:var(--txt);user-select:none}
+.gp-stage::before{content:"";position:absolute;inset:0;background-image:radial-gradient(#ffffff12 1px,transparent 1.6px);background-size:2.4em 2.4em;pointer-events:none}
+
+/* ---------- scene area ---------- */
+.gp-scenes{position:absolute;left:26%;right:2.5%;top:4.5%;bottom:25.5%}
+.sc{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:1.1em;opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s}
+.sc.active{opacity:1;visibility:visible}
+.sc h2{margin:0;font-size:3.3em;line-height:1.1;letter-spacing:-.01em}
+.sc h2 small{display:block;font-size:.4em;font-weight:600;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4em}
+.sc svg{display:block;width:100%;height:auto;overflow:visible}
+.sc svg text{font-family:inherit}
+.card-wrap{flex:1;min-height:0}
+.card-wrap svg{height:100%;max-height:100%}
+#sc2 h2{font-size:2.7em}
+
+[data-s]{opacity:0;transform:translateY(1.2em);transition:opacity .6s ease,transform .6s ease,filter .4s ease,box-shadow .4s ease,border-color .4s ease}
+[data-s].in{opacity:1;transform:none}
+svg [data-s]{transform:none}
+.hl{filter:drop-shadow(0 0 .8em var(--acc))}
+svg .hl{filter:drop-shadow(0 0 7px #ff8a3d) drop-shadow(0 0 2px #ff8a3d)}
+
+/* ---------- title scene ---------- */
+#sc0{align-items:flex-start;gap:.9em}
+.kicker{font-size:1.6em;color:var(--acc);font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+#sc0 h1{margin:0;font-size:7.6em;line-height:.95;letter-spacing:-.03em;font-weight:800;background:linear-gradient(90deg,#fff,#9fe7ff 60%,#ff8a3d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin:0;font-size:2.3em;color:#cfdaee;max-width:24em}
+.by{font-size:1.5em;color:var(--mut)}
+#sc0 .mini{width:min(26em,60%);margin-top:.6em}
+
+/* ---------- parts shared ---------- */
+.spin{animation:spin 1.1s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.flow{stroke-dasharray:9 9;animation:dash .8s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-18}}
+.pixov{opacity:1;transition:opacity 2.4s ease 1.2s}
+.in .pixov,.pixov.in{opacity:0}
+.lbl{font-size:13px;font-weight:700;fill:#fff;paint-order:stroke;stroke:#0b1220;stroke-width:3.5px;stroke-linejoin:round}
+.lbl.big{font-size:20px}
+.lbl.mid{font-size:17px;stroke-width:3px}
+.lbl.sm{font-size:10px;stroke-width:2.5px}
+.cap{font-size:15px;font-weight:700;fill:#dbe6fa}
+
+/* ---------- power bars ---------- */
+.bars{display:flex;flex-direction:column;gap:1em}
+.bar{display:grid;grid-template-columns:15em 1fr 9em;align-items:center;gap:1em;font-size:1.55em}
+.bar .bl{color:#dbe6fa;font-weight:600}
+.bar b{color:var(--acc);text-align:right;white-space:nowrap}
+.track{height:1.5em;border-radius:1em;background:#101829;border:1px solid var(--line);overflow:hidden}
+.track i{display:block;height:100%;width:0;border-radius:1em;background:linear-gradient(90deg,var(--cy),var(--acc));transition:width 1.6s cubic-bezier(.2,.8,.2,1) .2s}
+.in .track i,.track.in i{width:var(--w)}
+.bar.hot .track i{background:linear-gradient(90deg,var(--acc),var(--pk))}
+.heat{font-size:1.5em;color:#ffd9bd}
+
+/* ---------- vs panels ---------- */
+.vs{display:grid;grid-template-columns:1fr 1.6fr;gap:1.4em}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:1.2em;padding:1.1em 1.3em}
+.panel h3{margin:0 0 .2em;font-size:2.4em}
+.panel p{margin:0 0 .8em;font-size:1.5em;color:var(--mut)}
+.panel.hl{border-color:var(--acc);box-shadow:0 0 0 .25em rgba(255,138,61,.3);filter:none}
+.cores4{display:grid;grid-template-columns:repeat(4,1fr);gap:.6em;max-width:22em}
+.cores4 i{display:block;aspect-ratio:1;border-radius:.7em;background:linear-gradient(135deg,#ffb36b,var(--acc));box-shadow:inset 0 0 0 .2em rgba(255,255,255,.25)}
+.grid{display:grid;grid-template-columns:repeat(16,1fr);gap:.28em}
+.cell{aspect-ratio:1;border-radius:.25em;background:var(--cy);opacity:0;transition:opacity .35s ease var(--d)}
+.in .cell{opacity:.85}
+.hl .cell{animation:pulse 1.3s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes pulse{0%,100%{background:var(--cy);transform:scale(1)}50%{background:#fff;transform:scale(.7)}}
+.analogy{display:flex;justify-content:center;gap:1.2em;align-items:center;font-size:1.7em;color:#dbe6fa;background:var(--panel2);border:1px solid var(--line);border-radius:1em;padding:.6em 1em}
+.analogy b{color:var(--acc)}
+
+/* ---------- integrated vs dedicated ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.4em}
+.two .panel ul{margin:0 0 .8em;padding-left:1.1em;font-size:1.5em;line-height:1.45;color:#dbe6fa}
+.two .panel.ded{border-color:#2f5d7a}
+.bw{font-size:1.35em;color:var(--mut)}
+.bw .track{margin-top:.35em}
+.bw b{color:var(--txt)}
+.ded .track i{background:linear-gradient(90deg,var(--acc),var(--pk))}
+
+/* ---------- timeline ---------- */
+.tl{display:grid;grid-template-columns:repeat(5,1fr);gap:1em;position:relative;margin-top:.6em}
+.tl::before{content:"";position:absolute;left:4%;right:4%;top:1.15em;height:.3em;border-radius:1em;background:#26334d}
+.ti{position:relative;padding-top:2.4em;text-align:center}
+.ti::before{content:"";position:absolute;left:50%;top:.55em;width:1.4em;height:1.4em;margin-left:-.7em;border-radius:50%;background:var(--acc);box-shadow:0 0 0 .35em var(--bg)}
+.ti .y{font-size:2.6em;font-weight:800;color:#fff;line-height:1}
+.ti .t{margin-top:.4em;font-size:1.35em;color:#cfdaee;line-height:1.3}
+.ti.hl{filter:none}
+.ti.hl .y{color:var(--acc)}
+.ti.hl::before{box-shadow:0 0 0 .35em var(--bg),0 0 1.2em .3em var(--acc)}
+
+/* ---------- uses ---------- */
+.uses{display:grid;grid-template-columns:repeat(3,1fr);gap:1em}
+.use{background:var(--panel);border:1px solid var(--line);border-radius:1.1em;padding:.9em 1em;display:flex;align-items:center;gap:.8em;font-size:1.6em;font-weight:600}
+.use span{font-size:1.6em}
+.mk{display:flex;gap:1em;align-items:center;font-size:1.7em}
+.mk em{font-style:normal;color:var(--mut);margin-right:.4em}
+.chip{padding:.35em 1em;border-radius:2em;font-weight:800;letter-spacing:.04em}
+.chip.n{background:#76b900;color:#10200a}.chip.a{background:#ed1c24;color:#fff}.chip.i{background:#0071c5;color:#fff}
+
+/* ---------- conclusion ---------- */
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:.9em}
+.sum div{background:var(--panel);border:1px solid var(--line);border-radius:1em;padding:.8em 1em;font-size:1.55em;line-height:1.3;display:flex;gap:.6em;align-items:flex-start}
+.sum b{color:var(--gr)}
+.thanks{font-size:5.6em;font-weight:800;line-height:1;margin:0;background:linear-gradient(90deg,#fff,#ff8a3d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.src{font-size:1.15em;color:#7f90ad}
+
+/* ---------- stickman ---------- */
+.gp-sm{position:absolute;left:1.6%;bottom:10.5%;height:69%;aspect-ratio:220/330}
+.gp-sm svg{width:100%;height:100%;overflow:visible}
+.gp-sm .ln{stroke:#f4f7ff;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.gp-sm .hand{fill:#f4f7ff}
+#gpSm{--la:4deg;--lb:0deg;--ra:-4deg;--rb:0deg}
+#gpSm[data-pose=wave]{--ra:-132deg;--rb:0deg;--la:4deg}
+#gpSm[data-pose=present]{--ra:-52deg;--rb:-14deg;--la:6deg}
+#gpSm[data-pose=point]{--ra:-60deg;--rb:-2deg;--la:6deg}
+#gpSm[data-pose=explain]{--ra:-48deg;--rb:-22deg;--la:48deg;--lb:18deg}
+#gpSm[data-pose=idea]{--ra:-96deg;--rb:-70deg;--la:4deg}
+#gpSm[data-pose=cheer]{--ra:-138deg;--rb:8deg;--la:138deg;--lb:-8deg}
+.arm{transition:transform .8s cubic-bezier(.3,1.35,.5,1)}
+#gp-la{transform:rotate(var(--la));transform-origin:110px 106px}
+#gp-lb{transform:rotate(var(--lb));transform-origin:80px 152px}
+#gp-ra{transform:rotate(var(--ra));transform-origin:110px 106px}
+#gp-rb{transform:rotate(var(--rb));transform-origin:140px 152px}
+#gpSm[data-pose=wave] #gp-rb{animation:wv .5s ease-in-out infinite alternate}
+@keyframes wv{from{transform:rotate(-28deg)}to{transform:rotate(26deg)}}
+#gpSm[data-pose=cheer] #gp-ra,#gpSm[data-pose=cheer] #gp-la{animation:cheer .45s ease-in-out infinite alternate}
+@keyframes cheer{from{translate:0 0}to{translate:0 -4px}}
+.fig{transition:transform .3s}
+#gpSm.talk .fig{animation:bob .46s ease-in-out infinite alternate}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+#gp-mouth{fill:#f4f7ff;transform-box:fill-box;transform-origin:center;transform:scaleY(0);opacity:0}
+#gpSm.talk #gp-mouth{opacity:1;animation:mouth .26s ease-in-out infinite alternate}
+#gpSm.talk #gp-smile{opacity:0}
+@keyframes mouth{from{transform:scaleY(.25)}to{transform:scaleY(1.15)}}
+.eye{fill:#f4f7ff;transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+
+/* ---------- subtitle ---------- */
+.gp-sub{position:absolute;left:26%;right:2.5%;bottom:11.5%;min-height:11.5%;display:flex;align-items:center;padding:.7em 1.3em;font-size:1.75em;line-height:1.3;background:rgba(9,14,25,.82);border:1px solid var(--line);border-radius:1em;box-shadow:0 .4em 1.4em rgba(0,0,0,.35);backdrop-filter:blur(4px)}
+.gp-sub::before{content:"";position:absolute;left:-.55em;top:50%;margin-top:-.55em;border:.55em solid transparent;border-left:0;border-right:.7em solid var(--line)}
+.gp-sub::after{content:"";position:absolute;left:-.42em;top:50%;margin-top:-.5em;border:.5em solid transparent;border-left:0;border-right:.65em solid rgba(9,14,25,.95)}
+#gpSubTxt{transition:opacity .25s}
+
+/* ---------- controls ---------- */
+.gp-ctl{position:absolute;left:0;right:0;bottom:0;height:8.8%;display:flex;align-items:center;gap:.9em;padding:0 1.6em;background:rgba(7,10,18,.78);border-top:1px solid #1f2b44}
+.gp-btn{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:3.6em;height:3.6em;border-radius:50%;display:grid;place-items:center;background:var(--panel2);color:#dbe6fa;border:1px solid var(--line);transition:background .2s,transform .15s}
+.gp-btn:hover{background:#2a3b5c}.gp-btn:active{transform:scale(.93)}
+.gp-btn:focus-visible{outline:.2em solid var(--cy);outline-offset:.15em}
+.gp-btn svg{width:48%;height:48%;fill:currentColor}
+.gp-btn.big{width:4.4em;height:4.4em;background:var(--acc);color:#1b1006;border-color:transparent}
+.gp-btn.big:hover{background:#ffa062}
+#gpIcoPause{display:none}
+.playing #gpIcoPlay{display:none}.playing #gpIcoPause{display:block}
+.gp-prog{flex:1;display:flex;gap:.4em;align-items:center;min-width:0}
+.seg{all:unset;box-sizing:border-box;cursor:pointer;flex:1;height:1.1em;display:flex;align-items:center}
+.seg span{display:block;width:100%;height:.5em;border-radius:1em;background:#26334d;overflow:hidden;transition:height .2s}
+.seg:hover span{height:.8em}
+.seg i{display:block;height:100%;width:0;background:var(--cy);transition:width .4s}
+.seg.cur i{background:var(--acc)}
+.seg:focus-visible span{outline:.15em solid var(--cy)}
+#gpVoice .sl{display:none;stroke:#ff6b6b;stroke-width:2.4;stroke-linecap:round}
+#gpVoice.off .sl{display:block}
+#gpVoice.off .wv{opacity:.2}
+.gp-sel{display:none;max-width:11em;font-size:1em;background:var(--panel2);color:#dbe6fa;border:1px solid var(--line);border-radius:.6em;padding:.4em;flex:none}
+.gp-sel.show{display:block}
+
+/* ---------- overlay ---------- */
+.gp-over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1em;text-align:center;background:rgba(6,9,16,.72);backdrop-filter:blur(3px);z-index:5;transition:opacity .4s,visibility .4s;padding:2em}
+.gp-over.hide{opacity:0;visibility:hidden}
+.gp-over h3{margin:0;font-size:3.4em}
+.gp-start{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:.6em;background:var(--acc);color:#1b1006;font-weight:800;font-size:2.2em;padding:.55em 1.3em;border-radius:3em;box-shadow:0 .4em 2em rgba(255,138,61,.45);transition:transform .15s}
+.gp-start:hover{transform:scale(1.05)}
+.gp-start:focus-visible{outline:.15em solid var(--cy);outline-offset:.2em}
+.gp-start svg{width:1em;height:1em;fill:currentColor}
+.gp-vstat{font-size:1.45em;color:var(--mut);max-width:30em;line-height:1.4}
+.gp-vstat b{color:var(--gr)}.gp-vstat.warn b{color:#ffcf5c}
+
+/* ---------- narrow / phone layout ---------- */
+@container (max-width:700px){
+  .gp-stage{aspect-ratio:5/7;font-size:2.25cqw}
+  .gp-scenes{left:3.5%;right:3.5%;top:3%;bottom:40%}
+  .gp-sm{left:1.5%;bottom:11%;height:28%}
+  .gp-sub{left:27%;right:3%;bottom:12%;min-height:0;font-size:1.6em;padding:.6em 1em}
+  .gp-ctl{height:9.5%;padding:0 1em;gap:.6em}
+  .gp-btn{width:3.2em;height:3.2em}.gp-btn.big{width:3.8em;height:3.8em}
+  .sc h2{font-size:2.8em}
+  #sc0 h1{font-size:5.6em}.lead{font-size:1.9em}
+  .bar{grid-template-columns:9em 1fr 6em;font-size:1.25em;gap:.6em}
+  .tl{grid-template-columns:1fr;gap:.5em}.tl::before{display:none}
+  .ti{padding:0 0 0 3.4em;text-align:left}.ti::before{left:.7em;top:.35em;margin-left:0}
+  .ti .y{font-size:1.9em}.ti .t{font-size:1.2em;margin-top:.1em}
+  .uses{grid-template-columns:1fr 1fr}.use{font-size:1.3em}
+  .vs{grid-template-columns:1fr 1.7fr;gap:.6em}.two{grid-template-columns:1fr 1fr;gap:.6em}
+  .panel{padding:.6em .7em;border-radius:.9em}.panel h3{font-size:1.7em}.panel p{font-size:1.05em;margin-bottom:.5em}
+  .two .panel ul{font-size:1.05em;padding-left:1em}.bw{font-size:1.05em}
+  .cores4{grid-template-columns:1fr 1fr;gap:.4em}.grid{gap:.18em}
+  .analogy{font-size:1.25em;padding:.4em .6em;gap:.5em}
+  .sc{gap:.7em}
+  .heat{font-size:1.15em}.mk{font-size:1.2em;flex-wrap:wrap}.use{padding:.5em .6em}
+  .kicker{font-size:1.2em}.by{font-size:1.2em}
+  .src{font-size:.95em}.sum div{padding:.5em .7em}
+  .sum{grid-template-columns:1fr}.sum div{font-size:1.25em}
+  .thanks{font-size:4em}
+  .gp-over h3{font-size:2.6em}.gp-start{font-size:1.9em}
+}
+@media (prefers-reduced-motion:reduce){.spin,.flow,.hl .cell{animation:none}}
+</style>
+</head>
+<body>
+<div class="gp" id="gp">
+<div class="gp-stage" id="gpStage">
+
+  <div class="gp-scenes" id="gpScenes">
+
+    <!-- 0 · TITLU -->
+    <section class="sc" id="sc0">
+      <div class="kicker" data-s="0">Proiect la informatică</div>
+      <h1 data-s="0">Placa video</h1>
+      <p class="lead" data-s="1">GPU – „creierul” imaginilor din calculator</p>
+      <div class="by" id="gpBy" data-s="1"></div>
+      <div class="mini" data-s="2" data-inject="miniCard"></div>
+    </section>
+
+    <!-- 1 · CE ESTE -->
+    <section class="sc" id="sc1">
+      <h2 data-s="0"><small>Să începem</small>Ce este placa video?</h2>
+      <svg viewBox="0 0 800 270" role="img" aria-label="Procesorul trimite date către placa video, iar aceasta trimite imaginea la monitor">
+        <defs>
+          <linearGradient id="gp-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#35d0ff"/><stop offset="1" stop-color="#ffb36b"/></linearGradient>
+          <pattern id="gp-pix" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="12.5" height="12.5" rx="2" fill="#0e1420" opacity=".62"/></pattern>
+          <marker id="gp-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff8a3d"/></marker>
+        </defs>
+        <!-- procesor -->
+        <g data-s="1">
+          <rect x="14" y="80" width="104" height="104" rx="14" fill="#25324d" stroke="#7d8db3" stroke-width="3"/>
+          <rect x="38" y="104" width="56" height="56" rx="8" fill="#39465e" stroke="#c3cde0" stroke-width="2"/>
+          <g stroke="#9fb0c9" stroke-width="3" stroke-linecap="round">
+            <path d="M40 80v-14M58 80v-14M76 80v-14M94 80v-14M40 184v14M58 184v14M76 184v14M94 184v14M14 106h-12M14 124h-12M14 142h-12M14 160h-12M118 106h12M118 124h12M118 142h12M118 160h12"/>
+          </g>
+          <text x="66" y="138" text-anchor="middle" class="lbl">CPU</text>
+          <text x="66" y="236" text-anchor="middle" class="cap">Procesor</text>
+        </g>
+        <path data-s="1" class="flow" d="M138 132H244" fill="none" stroke="#ff8a3d" stroke-width="4" marker-end="url(#gp-arr)"/>
+        <!-- placa video -->
+        <g data-s="0" data-f="0">
+          <g transform="translate(250 62) scale(.885)" data-inject="miniCardSvg"></g>
+          <text x="365" y="236" text-anchor="middle" class="cap">Placa video</text>
+          <text x="365" y="256" text-anchor="middle" font-size="13" fill="#9fb0c9">GPU = Graphics Processing Unit</text>
+        </g>
+        <path data-s="2" class="flow" d="M492 132H570" fill="none" stroke="#ff8a3d" stroke-width="4" marker-end="url(#gp-arr)"/>
+        <!-- monitor -->
+        <g data-s="2" data-f="2">
+          <rect x="584" y="38" width="206" height="136" rx="10" fill="#0b1220" stroke="#7d8db3" stroke-width="4"/>
+          <rect x="594" y="48" width="186" height="116" rx="4" fill="url(#gp-sky)"/>
+          <circle cx="720" cy="86" r="17" fill="#fff6c9"/>
+          <path d="M594 164V132Q630 96 668 128T744 126Q770 120 780 134V164z" fill="#1f3b57"/>
+          <path d="M594 164V146Q640 120 690 146T780 148V164z" fill="#12263b"/>
+          <rect class="pixov" x="594" y="48" width="186" height="116" rx="4" fill="url(#gp-pix)"/>
+          <rect x="672" y="174" width="30" height="20" fill="#46557a"/>
+          <rect x="640" y="192" width="94" height="9" rx="4" fill="#46557a"/>
+          <text x="687" y="236" text-anchor="middle" class="cap">Monitor</text>
+        </g>
+      </svg>
+    </section>
+
+    <!-- 2 · COMPONENTE -->
+    <section class="sc" id="sc2">
+      <h2 data-s="0"><small>Pe dinăuntru</small>Din ce este făcută?</h2>
+      <div class="card-wrap" data-inject="bigCard"></div>
+    </section>
+
+    <!-- 3 · CURENT ȘI CĂLDURĂ -->
+    <section class="sc" id="sc3">
+      <h2 data-s="0"><small>Energie</small>Curent și căldură</h2>
+      <div class="bars">
+        <div class="bar" data-s="0" data-f="0"><span class="bl">Slotul PCI Express</span><div class="track" style="--w:25%"><i></i></div><b>până la 75 W</b></div>
+        <div class="bar" data-s="1" data-f="1"><span class="bl">Conector cu 6 pini</span><div class="track" style="--w:25%"><i></i></div><b>75 W</b></div>
+        <div class="bar" data-s="1" data-f="1"><span class="bl">Conector cu 8 pini</span><div class="track" style="--w:50%"><i></i></div><b>150 W</b></div>
+        <div class="bar hot" data-s="2" data-f="2"><span class="bl">Placă de top (în jocuri)</span><div class="track" style="--w:100%"><i></i></div><b>~300 W</b></div>
+      </div>
+      <div class="heat" data-s="2">🔥 Aproape toată energia se transformă în căldură – de aceea sunt necesare radiatoare și ventilatoare.</div>
+    </section>
+
+    <!-- 4 · CUM FUNCȚIONEAZĂ -->
+    <section class="sc" id="sc4">
+      <h2 data-s="0"><small>Pas cu pas</small>Cum ajunge imaginea pe ecran?</h2>
+      <svg viewBox="0 0 800 250" role="img" aria-label="Lanțul de la program la monitor">
+        <defs><marker id="gp-arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#35d0ff"/></marker></defs>
+        <g data-s="0" data-f="0"><rect x="0" y="40" width="130" height="100" rx="14" fill="#25324d" stroke="#7d8db3" stroke-width="3"/><text x="65" y="84" text-anchor="middle" class="lbl mid">Jocul</text><text x="65" y="108" text-anchor="middle" font-size="14" fill="#cfdaee">sau programul</text></g>
+        <path data-s="1" class="flow" d="M134 90H156" fill="none" stroke="#35d0ff" stroke-width="4" marker-end="url(#gp-arr2)"/>
+        <g data-s="1" data-f="1"><rect x="160" y="40" width="130" height="100" rx="14" fill="#2b3b5e" stroke="#7d8db3" stroke-width="3"/><text x="225" y="84" text-anchor="middle" class="lbl mid">Procesorul</text><text x="225" y="108" text-anchor="middle" font-size="14" fill="#cfdaee">CPU</text></g>
+        <path data-s="2" class="flow" d="M294 90H316" fill="none" stroke="#35d0ff" stroke-width="4" marker-end="url(#gp-arr2)"/>
+        <g data-s="2" data-f="2"><rect x="320" y="40" width="130" height="100" rx="14" fill="#7a3f17" stroke="#ff8a3d" stroke-width="3"/><text x="385" y="84" text-anchor="middle" class="lbl mid">Placa video</text><text x="385" y="108" text-anchor="middle" font-size="14" fill="#ffe2cc">GPU calculează</text></g>
+        <path data-s="2" class="flow" d="M454 90H476" fill="none" stroke="#35d0ff" stroke-width="4" marker-end="url(#gp-arr2)"/>
+        <g data-s="2" data-f="2"><rect x="480" y="40" width="130" height="100" rx="14" fill="#1d4a5c" stroke="#35d0ff" stroke-width="3"/><text x="545" y="84" text-anchor="middle" class="lbl mid">Memoria</text><text x="545" y="108" text-anchor="middle" font-size="14" fill="#cdf3ff">video (VRAM)</text></g>
+        <path data-s="3" class="flow" d="M614 90H636" fill="none" stroke="#35d0ff" stroke-width="4" marker-end="url(#gp-arr2)"/>
+        <g data-s="3" data-f="3"><rect x="640" y="40" width="130" height="100" rx="14" fill="#25324d" stroke="#7d8db3" stroke-width="3"/><text x="705" y="84" text-anchor="middle" class="lbl mid">Monitorul</text><text x="705" y="108" text-anchor="middle" font-size="14" fill="#cfdaee">HDMI / DisplayPort</text></g>
+        <g data-s="3"><rect x="200" y="176" width="400" height="56" rx="28" fill="#172033" stroke="#2a3957" stroke-width="2"/><text x="400" y="212" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">↻ de ~60 de ori pe secundă</text></g>
+      </svg>
+    </section>
+
+    <!-- 5 · CPU vs GPU -->
+    <section class="sc" id="sc5">
+      <h2 data-s="0"><small>Diferența</small>Procesor sau placă video?</h2>
+      <div class="vs">
+        <div class="panel" data-s="0" data-f="0"><h3>CPU</h3><p>câteva nuclee foarte puternice</p><div class="cores4"><i></i><i></i><i></i><i></i></div></div>
+        <div class="panel" data-s="1" data-f="2"><h3>GPU</h3><p>sute sau mii de nuclee mici</p><div class="grid" id="gpGrid"></div></div>
+      </div>
+      <div class="analogy" data-s="3">🧑‍🏫 <b>un profesor genial</b> &nbsp;sau&nbsp; 🧑‍🎓🧑‍🎓🧑‍🎓 <b>o clasă întreagă</b></div>
+    </section>
+
+    <!-- 6 · INTEGRATĂ vs DEDICATĂ -->
+    <section class="sc" id="sc6">
+      <h2 data-s="0"><small>Două feluri</small>Integrată sau dedicată?</h2>
+      <div class="two">
+        <div class="panel" data-s="0" data-f="0"><h3>Integrată</h3>
+          <ul><li>face parte din procesor sau din placa de bază</li><li>folosește o parte din memoria RAM</li><li>ieftină, consum mic</li></ul>
+          <div class="bw" data-s="2">Viteza memoriei: <b>circa 128 GB/s</b><div class="track" style="--w:12%"><i></i></div></div></div>
+        <div class="panel ded" data-s="1" data-f="1"><h3>Dedicată</h3>
+          <ul><li>piesă separată, pusă în slot</li><li>are propria memorie video (GDDR)</li><li>mult mai puternică, dar mai scumpă</li></ul>
+          <div class="bw" data-s="2">Viteza memoriei: <b>peste 1000 GB/s</b><div class="track" style="--w:100%"><i></i></div></div></div>
+      </div>
+    </section>
+
+    <!-- 7 · ISTORIC -->
+    <section class="sc" id="sc7">
+      <h2 data-s="0"><small>Puțină istorie</small>Cum a evoluat?</h2>
+      <div class="tl">
+        <div class="ti" data-s="0" data-f="0"><div class="y">1981</div><div class="t">primul procesor grafic pe un singur cip pentru PC (NEC μPD7220)</div></div>
+        <div class="ti" data-s="1" data-f="1"><div class="y">1994</div><div class="t">termenul „GPU” apare la Sony, pentru PlayStation</div></div>
+        <div class="ti" data-s="2" data-f="2"><div class="y">2002</div><div class="t">shadere programabile (ATI Radeon 9700)</div></div>
+        <div class="ti" data-s="3" data-f="3"><div class="y">2007</div><div class="t">CUDA: calcule pe GPU (NVIDIA)</div></div>
+        <div class="ti" data-s="4" data-f="4"><div class="y">2018</div><div class="t">ray tracing în timp real (seria RTX 20)</div></div>
+      </div>
+    </section>
+
+    <!-- 8 · UTILIZĂRI -->
+    <section class="sc" id="sc8">
+      <h2 data-s="0"><small>La ce folosește</small>Utilizări și producători</h2>
+      <div class="uses">
+        <div class="use" data-s="0"><span>🎮</span>Jocuri</div>
+        <div class="use" data-s="0"><span>🎬</span>Montaj video</div>
+        <div class="use" data-s="0"><span>🧊</span>Modelare 3D</div>
+        <div class="use" data-s="1"><span>🤖</span>Inteligență artificială</div>
+        <div class="use" data-s="1"><span>🔬</span>Cercetare științifică</div>
+        <div class="use" data-s="1"><span>⛏️</span>Minat de criptomonede</div>
+      </div>
+      <div class="mk" data-s="2"><em>Producători principali:</em><span class="chip n">NVIDIA</span><span class="chip a">AMD</span><span class="chip i">Intel</span></div>
+    </section>
+
+    <!-- 9 · CONCLUZIE -->
+    <section class="sc" id="sc9">
+      <h2 data-s="0"><small>Pe scurt</small>Ce am învățat</h2>
+      <div class="sum" data-s="0">
+        <div><b>✔</b><span>Placa video desenează imaginile pe care le vedem</span></div>
+        <div><b>✔</b><span>Are GPU, memorie video, alimentare și răcire</span></div>
+        <div><b>✔</b><span>Mii de nuclee lucrează în paralel</span></div>
+        <div><b>✔</b><span>Poate fi integrată sau dedicată</span></div>
+      </div>
+      <p class="thanks" data-s="1">Mulțumesc!</p>
+      <div class="src" data-s="1">Surse: Wikipedia – „Graphics processing unit” și „Video card”. Voce: Piper TTS, model ro_RO-mihai (date CC0).</div>
+    </section>
+  </div>
+
+  <!-- STICKMAN -->
+  <div class="gp-sm" id="gpSmWrap" aria-hidden="true">
+    <svg viewBox="0 0 220 330" id="gpSm" data-pose="idle">
+      <ellipse cx="110" cy="314" rx="54" ry="8" fill="#000" opacity=".38"/>
+      <g class="fig">
+        <path class="ln" d="M110 200L86 298M110 200L134 298M86 298H66M134 298H154"/>
+        <line class="ln" x1="110" y1="84" x2="110" y2="202"/>
+        <g class="arm" id="gp-la"><line class="ln" x1="110" y1="106" x2="80" y2="152"/><g class="arm" id="gp-lb"><line class="ln" x1="80" y1="152" x2="66" y2="198"/><circle class="hand" cx="66" cy="199" r="7"/></g></g>
+        <g class="arm" id="gp-ra"><line class="ln" x1="110" y1="106" x2="140" y2="152"/><g class="arm" id="gp-rb"><line class="ln" x1="140" y1="152" x2="154" y2="198"/><circle class="hand" cx="154" cy="199" r="7"/></g></g>
+        <path d="M110 92l-13-8v16zM110 92l13-8v16z" fill="#ff8a3d" stroke="#ff8a3d" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="110" cy="52" r="31" fill="#0e1420" stroke="#f4f7ff" stroke-width="7"/>
+        <circle class="eye" cx="99" cy="47" r="3.8"/><circle class="eye" cx="121" cy="47" r="3.8"/>
+        <path id="gp-smile" d="M97 62Q110 74 123 62" fill="none" stroke="#f4f7ff" stroke-width="4" stroke-linecap="round"/>
+        <ellipse id="gp-mouth" cx="110" cy="66" rx="8" ry="6"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="gp-sub" id="gpSub" aria-live="polite"><span id="gpSubTxt"></span></div>
+
+  <div class="gp-ctl">
+    <button class="gp-btn" id="gpPrev" title="Scena anterioară" aria-label="Scena anterioară"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+    <button class="gp-btn big" id="gpPlay" title="Redare / pauză" aria-label="Redare sau pauză"><svg id="gpIcoPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg id="gpIcoPause" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
+    <button class="gp-btn" id="gpNext" title="Scena următoare" aria-label="Scena următoare"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+    <div class="gp-prog" id="gpProg"></div>
+    <select class="gp-sel" id="gpVoiceSel" aria-label="Alege vocea"></select>
+    <button class="gp-btn" id="gpVoice" title="Voce pornită / oprită" aria-label="Voce pornită sau oprită"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path class="wv" d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="sl" d="M4 4l16 16"/></svg></button>
+  </div>
+
+  <div class="gp-over" id="gpOver">
+    <h3 id="gpOverTitle">Placa video</h3>
+    <button class="gp-start" id="gpStart"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span id="gpStartTxt">Pornește prezentarea</span></button>
+    <div class="gp-vstat" id="gpVstat"></div>
+  </div>
+
+</div>
+</div>
+
+<noscript><p style="max-width:30em;text-align:center">Prezentarea are nevoie de JavaScript ca să ruleze.</p></noscript>
+
+<script>
+(function(){
+"use strict";
+
+/* ===== Setări ===== */
+var AUTOR = "";   // scrie aici numele tău, ex.: "Ana Popescu, clasa a 9-a"
+
+/* ===== Scenariu: fiecare scenă are pași; fiecare pas = text vorbit + poziția stickmanului ===== */
+var SCENES = [
+ { name:"Introducere", steps:[
+  {p:"wave",   t:"Salut! Eu sunt Stickman, iar azi vă povestesc despre placa video."},
+  {p:"present",t:"Este piesa din calculator care desenează tot ce vedem pe ecran: jocuri, filme și poze."},
+  {p:"point",  t:"Haideți să vedem din ce este făcută și cum funcționează!"}]},
+ { name:"Ce este?", steps:[
+  {p:"present",t:"Placa video, numită și placă grafică, este componenta calculatorului care se ocupă de imagini. Cipul ei principal se numește GPU, adică unitate de procesare grafică."},
+  {p:"point",  t:"Ea primește de la procesor datele unui joc sau ale unui film și calculează culoarea fiecărui punct de pe ecran, numit pixel."},
+  {p:"explain",t:"Apoi trimite imaginea gata făcută la monitor, de zeci de ori pe secundă, ca mișcarea să pară fluidă."}]},
+ { name:"Componente", steps:[
+  {p:"present",t:"Să deschidem o placă video și să vedem ce are înăuntru."},
+  {p:"point",  t:"În mijloc este GPU-ul: cipul principal, creierul plăcii, care face toate calculele."},
+  {p:"point",  t:"În jurul lui sunt cipurile de memorie video, numite VRAM. Acolo se păstrează imaginea, texturile și rezultatele calculelor."},
+  {p:"present",t:"Într-o parte este zona de alimentare, care transformă curentul de la sursă în cel de care are nevoie cipul."},
+  {p:"point",  t:"Placa primește curent prin conectorii de alimentare, iar prin slotul PCI Express se leagă de placa de bază."},
+  {p:"idea",   t:"Un GPU puternic se încălzește mult, așa că deasupra lui se montează un radiator cu ventilatoare."},
+  {p:"present",t:"La capătul plăcii sunt porturile HDMI și DisplayPort, de unde pleacă imaginea spre monitor."}]},
+ { name:"Energie", steps:[
+  {p:"present",t:"O placă video consumă multă energie. Din slotul PCI Express primește cel mult 75 de wați."},
+  {p:"point",  t:"Dacă are nevoie de mai mult, se leagă direct la sursa calculatorului. Un conector cu 6 pini dă 75 de wați, iar unul cu 8 pini dă 150."},
+  {p:"idea",   t:"Plăcile de top pot consuma sute de wați. De exemplu, un model din 2018, RTX 2080 Ti, a avut în jocuri o medie de aproximativ 300. Aproape toată energia devine căldură, de aceea sunt necesare radiatoare și ventilatoare."}]},
+ { name:"Cum lucrează", steps:[
+  {p:"present",t:"Totul începe cu un joc sau un program care vrea să afișeze ceva."},
+  {p:"point",  t:"Procesorul, adică CPU, pregătește datele și le trimite către placa video."},
+  {p:"explain",t:"GPU-ul calculează forme, lumini și culori și pune imaginea gata făcută în memoria video."},
+  {p:"point",  t:"De acolo, imaginea pleacă prin HDMI sau DisplayPort spre monitor. Procesul se repetă de zeci de ori pe secundă."}]},
+ { name:"CPU și GPU", steps:[
+  {p:"point",  t:"Procesorul are doar câteva nuclee, dar foarte puternice, bune la sarcini complicate."},
+  {p:"present",t:"Placa video are sute sau chiar mii de nuclee mici, care lucrează toate în același timp."},
+  {p:"explain",t:"O imagine Full HD are peste două milioane de pixeli, iar fiecare poate fi calculat aproape independent. De aceea o armată de nuclee mici îi desenează mult mai repede."},
+  {p:"idea",   t:"E ca diferența dintre un singur profesor foarte priceput și o clasă întreagă, în care fiecare elev rezolvă câte o problemă simplă, în același timp."}]},
+ { name:"Integrată sau dedicată", steps:[
+  {p:"present",t:"Există două feluri de plăci video. Cea integrată face parte din procesor sau din placa de bază și folosește o parte din memoria RAM. Costă puțin și consumă puțin, dar este mai slabă."},
+  {p:"point",  t:"Placa dedicată este o piesă separată, cu propria memorie video, de tip GDDR. Costă mai mult și consumă mai multă energie, dar este mult mai puternică."},
+  {p:"explain",t:"Memoria unei plăci dedicate poate transfera peste o mie de gigaocteți pe secundă, iar la cea integrată ajunge la circa o sută douăzeci și opt. Pentru jocuri moderne și montaj video se alege, de obicei, o placă dedicată."}]},
+ { name:"Istoric", steps:[
+  {p:"present",t:"Placa video are o istorie lungă. În 1981, cipul NEC μPD7220 a fost primul procesor grafic pe un singur cip pentru calculatoare personale."},
+  {p:"point",  t:"În 1994, firma Sony a folosit termenul GPU pentru cipul grafic al consolei PlayStation."},
+  {p:"point",  t:"În 2002, placa Radeon 9700 de la ATI a adus shadere programabile, adică programe mici care schimbă felul în care sunt desenate luminile și culorile."},
+  {p:"present",t:"În 2007, NVIDIA a lansat CUDA, care a permis folosirea plăcilor video și pentru alte calcule, nu doar pentru imagini."},
+  {p:"cheer",  t:"În 2018, seria RTX 20 a adus nuclee speciale pentru ray tracing, adică lumini și reflexii realiste calculate în timp real, plus nuclee pentru inteligență artificială."}]},
+ { name:"Utilizări", steps:[
+  {p:"present",t:"Placa video se folosește la jocuri, la montaj video și la modelare 3D."},
+  {p:"explain",t:"Dar și la inteligență artificială, la simulări științifice și chiar la minat de criptomonede."},
+  {p:"point",  t:"Cei trei mari producători sunt NVIDIA, AMD și Intel."}]},
+ { name:"Concluzie", steps:[
+  {p:"explain",t:"Pe scurt: placa video desenează imaginile pe care le vedem, are un GPU, memorie video și răcire, iar mii de nuclee lucrează în paralel."},
+  {p:"cheer",  t:"Vă mulțumesc pentru atenție! Aveți întrebări?"}]}
+];
+
+/* ===== Desenele refolosite (SVG) ===== */
+function fan(cx,cy,r,col){
+  var b="";
+  for(var k=0;k<7;k++){
+    b+='<path d="M0 -'+(r*.17)+' C'+(r*.2)+' -'+(r*.42)+' '+(r*.42)+' -'+(r*.88)+' '+(r*.1)+' -'+(r*.99)+' C-'+(r*.1)+' -'+(r*.8)+' -'+(r*.14)+' -'+(r*.42)+' 0 -'+(r*.17)+'z" transform="rotate('+(k*360/7)+')" fill="'+col+'"/>';
+  }
+  return '<g transform="translate('+cx+' '+cy+')"><circle r="'+r+'" fill="#0f1522" stroke="#55658c" stroke-width="3"/>'+
+         '<g class="spin"><circle r="'+(r*.95)+'" fill="none"/>'+b+'</g>'+
+         '<circle r="'+(r*.2)+'" fill="#2c3853" stroke="#8d9cc2" stroke-width="2"/></g>';
+}
+function miniCardSvg(){
+  return '<defs><linearGradient id="gp-g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c76b"/><stop offset="1" stop-color="#b98a2e"/></linearGradient></defs>'+
+    '<rect x="0" y="22" width="9" height="78" rx="2" fill="#aeb8c8"/>'+
+    '<rect x="9" y="12" width="243" height="94" rx="13" fill="#1c2436" stroke="#46557a" stroke-width="3"/>'+
+    fan(78,59,34,"#6b7fa8")+fan(178,59,34,"#6b7fa8")+
+    '<rect x="70" y="106" width="130" height="12" fill="url(#gp-g2)"/>'+
+    '<rect x="196" y="4" width="46" height="9" rx="2" fill="#12161f"/>';
+}
+function miniCard(){return '<svg viewBox="0 0 260 130">'+miniCardSvg()+'</svg>';}
+
+function bigCard(){
+  var i, s='';
+  s+='<svg viewBox="0 0 640 350" role="img" aria-label="Placa video văzută de sus, cu componentele marcate">';
+  s+='<defs><linearGradient id="gp-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c76b"/><stop offset="1" stop-color="#b98a2e"/></linearGradient>'+
+     '<pattern id="gp-fing" width="8" height="22" patternUnits="userSpaceOnUse"><rect width="5.5" height="22" fill="url(#gp-gold)"/></pattern></defs>';
+  // PCB
+  s+='<g data-s="0"><rect x="50" y="90" width="560" height="200" rx="12" fill="#127a69" stroke="#0b4d42" stroke-width="3"/>'+
+     '<g fill="none" stroke="#1fae96" stroke-width="2" opacity=".55"><path d="M70 120H190M70 150H180M70 230H190M70 260H170M450 110H590M450 270H590M120 100V280"/></g></g>';
+  // GPU die
+  s+='<g data-s="1" data-f="1"><rect x="270" y="140" width="96" height="96" rx="7" fill="#39465e" stroke="#c3cde0" stroke-width="3"/>'+
+     '<rect x="282" y="152" width="72" height="72" rx="4" fill="#2a3550"/><text x="318" y="196" text-anchor="middle" class="lbl big">GPU</text></g>';
+  // VRAM
+  var ch=[[196,136],[196,180],[196,224],[390,136],[390,180],[390,224],[270,100,44,30],[322,100,44,30],[270,246,44,30],[322,246,44,30]];
+  s+='<g data-s="2" data-f="2">';
+  for(i=0;i<ch.length;i++){var c=ch[i],w=c[2]||50,h=c[3]||36;
+    s+='<rect x="'+c[0]+'" y="'+c[1]+'" width="'+w+'" height="'+h+'" rx="4" fill="#12161f" stroke="#7b88a6" stroke-width="2"/>';
+    if(!c[2]) s+='<text x="'+(c[0]+w/2)+'" y="'+(c[1]+h/2+4)+'" text-anchor="middle" class="lbl sm">VRAM</text>';}
+  s+='</g>';
+  // VRM
+  s+='<g data-s="3" data-f="3">';
+  for(var r=0;r<3;r++)for(var q=0;q<3;q++){var x=476+q*38,y=140+r*40;
+    s+='<rect x="'+x+'" y="'+y+'" width="30" height="30" rx="5" fill="#2a3347" stroke="#8e9ab3" stroke-width="2"/><circle cx="'+(x+15)+'" cy="'+(y+15)+'" r="8" fill="none" stroke="#c3cde0" stroke-width="2"/>';}
+  s+='<text x="533" y="132" text-anchor="middle" class="lbl">Alimentare</text></g>';
+  // Alimentare + PCIe
+  s+='<g data-s="4" data-f="4"><rect x="466" y="66" width="110" height="26" rx="4" fill="#12161f" stroke="#7b88a6" stroke-width="2"/>';
+  for(i=0;i<8;i++) s+='<rect x="'+(474+i*12.5)+'" y="72" width="8" height="14" rx="1.5" fill="#c3cde0"/>';
+  s+='<text x="521" y="58" text-anchor="middle" class="lbl">Conector de alimentare</text>'+
+     '<rect x="150" y="290" width="290" height="22" fill="url(#gp-fing)"/>'+
+     '<text x="295" y="334" text-anchor="middle" class="lbl">Slot PCI Express (spre placa de bază)</text></g>';
+  // Cooler
+  s+='<g data-s="5" data-f="5" style="transition:opacity .7s,transform .9s,filter .4s;transform:translateY(-34px)" class="cooler">'+
+     '<rect x="84" y="100" width="500" height="180" rx="24" fill="#1c2436" stroke="#5a6b94" stroke-width="3"/>';
+  for(i=0;i<9;i++) s+='<line x1="'+(98+i*6)+'" y1="116" x2="'+(98+i*6)+'" y2="264" stroke="#33415f" stroke-width="2"/><line x1="'+(520+i*6)+'" y1="116" x2="'+(520+i*6)+'" y2="264" stroke="#33415f" stroke-width="2"/>';
+  s+=fan(240,190,70,"#7d93c4")+fan(430,190,70,"#7d93c4")+
+     '<text x="334" y="88" text-anchor="middle" class="lbl">Radiator + ventilatoare</text></g>';
+  // Ports
+  s+='<g data-s="6" data-f="6"><rect x="20" y="98" width="30" height="184" rx="3" fill="#aeb8c8"/>'+
+     '<rect x="24" y="112" width="22" height="34" rx="3" fill="#0b0f17"/><rect x="24" y="158" width="22" height="34" rx="3" fill="#0b0f17"/><rect x="24" y="204" width="22" height="34" rx="3" fill="#0b0f17"/>'+
+     '<text x="10" y="318" class="lbl">Porturi HDMI / DisplayPort</text></g>';
+  s+='</svg>';
+  return s;
+}
+var INJECT={miniCard:miniCard,miniCardSvg:miniCardSvg,bigCard:bigCard};
+Array.prototype.forEach.call(document.querySelectorAll("[data-inject]"),function(n){
+  var f=INJECT[n.getAttribute("data-inject")]; if(!f) return;
+  if(n.tagName.toLowerCase()==="svg"){ n.innerHTML=f(); } else { n.innerHTML=f(); }
+});
+// cooler needs .in handling for translate (SVG exception to "svg [data-s]{transform:none}")
+var st=document.createElement("style");
+st.textContent=".cooler{transform:translateY(-34px)!important}.cooler.in{transform:none!important}.cooler{opacity:0}.cooler.in{opacity:1}";
+document.head.appendChild(st);
+
+// grid GPU cores
+(function(){var g=document.getElementById("gpGrid"),h="";
+  for(var i=0;i<80;i++){var d=((i%16)*38+Math.floor(i/16)*70+(i*13%7)*14);h+='<i class="cell" style="--d:'+d+'ms"></i>';}
+  g.innerHTML=h;})();
+if(AUTOR){document.getElementById("gpBy").textContent="Prezentat de: "+AUTOR;}
+
+/* ===== Elemente ===== */
+function $(id){return document.getElementById(id);}
+var gp=$("gp"), stage=$("gpStage"), sm=$("gpSm"), subTxt=$("gpSubTxt"), prog=$("gpProg");
+var scEls=SCENES.map(function(s,i){return $("sc"+i);});
+
+/* ===== Progres ===== */
+var segs=SCENES.map(function(s,i){
+  var b=document.createElement("button");b.className="seg";b.title=(i+1)+". "+s.name;b.setAttribute("aria-label","Scena "+(i+1)+": "+s.name);
+  b.innerHTML="<span><i></i></span>";b.addEventListener("click",function(){go(i,0);});prog.appendChild(b);return b;});
+
+/* ===== Narațiune audio pregenerată (Piper, voce „Mihai”) – cheie = textul exact al propoziției ===== */
+var AUDIO = {
+ "Salut!": "audio/s0-0-0.mp3",
+ "Eu sunt Stickman, iar azi vă povestesc despre placa video.": "audio/s0-0-1.mp3",
+ "Este piesa din calculator care desenează tot ce vedem pe ecran: jocuri, filme și poze.": "audio/s0-1-0.mp3",
+ "Haideți să vedem din ce este făcută și cum funcționează!": "audio/s0-2-0.mp3",
+ "Placa video, numită și placă grafică, este componenta calculatorului care se ocupă de imagini.": "audio/s1-0-0.mp3",
+ "Cipul ei principal se numește GPU, adică unitate de procesare grafică.": "audio/s1-0-1.mp3",
+ "Ea primește de la procesor datele unui joc sau ale unui film și calculează culoarea fiecărui punct de pe ecran, numit pixel.": "audio/s1-1-0.mp3",
+ "Apoi trimite imaginea gata făcută la monitor, de zeci de ori pe secundă, ca mișcarea să pară fluidă.": "audio/s1-2-0.mp3",
+ "Să deschidem o placă video și să vedem ce are înăuntru.": "audio/s2-0-0.mp3",
+ "În mijloc este GPU-ul: cipul principal, creierul plăcii, care face toate calculele.": "audio/s2-1-0.mp3",
+ "În jurul lui sunt cipurile de memorie video, numite VRAM.": "audio/s2-2-0.mp3",
+ "Acolo se păstrează imaginea, texturile și rezultatele calculelor.": "audio/s2-2-1.mp3",
+ "Într-o parte este zona de alimentare, care transformă curentul de la sursă în cel de care are nevoie cipul.": "audio/s2-3-0.mp3",
+ "Placa primește curent prin conectorii de alimentare, iar prin slotul PCI Express se leagă de placa de bază.": "audio/s2-4-0.mp3",
+ "Un GPU puternic se încălzește mult, așa că deasupra lui se montează un radiator cu ventilatoare.": "audio/s2-5-0.mp3",
+ "La capătul plăcii sunt porturile HDMI și DisplayPort, de unde pleacă imaginea spre monitor.": "audio/s2-6-0.mp3",
+ "O placă video consumă multă energie.": "audio/s3-0-0.mp3",
+ "Din slotul PCI Express primește cel mult 75 de wați.": "audio/s3-0-1.mp3",
+ "Dacă are nevoie de mai mult, se leagă direct la sursa calculatorului.": "audio/s3-1-0.mp3",
+ "Un conector cu 6 pini dă 75 de wați, iar unul cu 8 pini dă 150.": "audio/s3-1-1.mp3",
+ "Plăcile de top pot consuma sute de wați.": "audio/s3-2-0.mp3",
+ "De exemplu, un model din 2018, RTX 2080 Ti, a avut în jocuri o medie de aproximativ 300.": "audio/s3-2-1.mp3",
+ "Aproape toată energia devine căldură, de aceea sunt necesare radiatoare și ventilatoare.": "audio/s3-2-2.mp3",
+ "Totul începe cu un joc sau un program care vrea să afișeze ceva.": "audio/s4-0-0.mp3",
+ "Procesorul, adică CPU, pregătește datele și le trimite către placa video.": "audio/s4-1-0.mp3",
+ "GPU-ul calculează forme, lumini și culori și pune imaginea gata făcută în memoria video.": "audio/s4-2-0.mp3",
+ "De acolo, imaginea pleacă prin HDMI sau DisplayPort spre monitor.": "audio/s4-3-0.mp3",
+ "Procesul se repetă de zeci de ori pe secundă.": "audio/s4-3-1.mp3",
+ "Procesorul are doar câteva nuclee, dar foarte puternice, bune la sarcini complicate.": "audio/s5-0-0.mp3",
+ "Placa video are sute sau chiar mii de nuclee mici, care lucrează toate în același timp.": "audio/s5-1-0.mp3",
+ "O imagine Full HD are peste două milioane de pixeli, iar fiecare poate fi calculat aproape independent.": "audio/s5-2-0.mp3",
+ "De aceea o armată de nuclee mici îi desenează mult mai repede.": "audio/s5-2-1.mp3",
+ "E ca diferența dintre un singur profesor foarte priceput și o clasă întreagă, în care fiecare elev rezolvă câte o problemă simplă, în același timp.": "audio/s5-3-0.mp3",
+ "Există două feluri de plăci video.": "audio/s6-0-0.mp3",
+ "Cea integrată face parte din procesor sau din placa de bază și folosește o parte din memoria RAM.": "audio/s6-0-1.mp3",
+ "Costă puțin și consumă puțin, dar este mai slabă.": "audio/s6-0-2.mp3",
+ "Placa dedicată este o piesă separată, cu propria memorie video, de tip GDDR.": "audio/s6-1-0.mp3",
+ "Costă mai mult și consumă mai multă energie, dar este mult mai puternică.": "audio/s6-1-1.mp3",
+ "Memoria unei plăci dedicate poate transfera peste o mie de gigaocteți pe secundă, iar la cea integrată ajunge la circa o sută douăzeci și opt.": "audio/s6-2-0.mp3",
+ "Pentru jocuri moderne și montaj video se alege, de obicei, o placă dedicată.": "audio/s6-2-1.mp3",
+ "Placa video are o istorie lungă.": "audio/s7-0-0.mp3",
+ "În 1981, cipul NEC μPD7220 a fost primul procesor grafic pe un singur cip pentru calculatoare personale.": "audio/s7-0-1.mp3",
+ "În 1994, firma Sony a folosit termenul GPU pentru cipul grafic al consolei PlayStation.": "audio/s7-1-0.mp3",
+ "În 2002, placa Radeon 9700 de la ATI a adus shadere programabile, adică programe mici care schimbă felul în care sunt desenate luminile și culorile.": "audio/s7-2-0.mp3",
+ "În 2007, NVIDIA a lansat CUDA, care a permis folosirea plăcilor video și pentru alte calcule, nu doar pentru imagini.": "audio/s7-3-0.mp3",
+ "În 2018, seria RTX 20 a adus nuclee speciale pentru ray tracing, adică lumini și reflexii realiste calculate în timp real, plus nuclee pentru inteligență artificială.": "audio/s7-4-0.mp3",
+ "Placa video se folosește la jocuri, la montaj video și la modelare 3D.": "audio/s8-0-0.mp3",
+ "Dar și la inteligență artificială, la simulări științifice și chiar la minat de criptomonede.": "audio/s8-1-0.mp3",
+ "Cei trei mari producători sunt NVIDIA, AMD și Intel.": "audio/s8-2-0.mp3",
+ "Pe scurt: placa video desenează imaginile pe care le vedem, are un GPU, memorie video și răcire, iar mii de nuclee lucrează în paralel.": "audio/s9-0-0.mp3",
+ "Vă mulțumesc pentru atenție!": "audio/s9-1-0.mp3",
+ "Aveți întrebări?": "audio/s9-1-1.mp3"
+};
+var HAS_AUDIO = Object.keys(AUDIO).length > 0;
+var player = new Audio(); player.preload = "auto";   // un singur element, „deblocat” de primul click
+var BLOBS = {};
+function warmAudio(){   // descarcă toate clipurile în memorie, ca redarea să pornească fără așteptare
+  if(!window.fetch||!window.URL)return;
+  var list=Object.keys(AUDIO).map(function(k){return AUDIO[k];}), i=0;
+  (function nx(){ if(i>=list.length)return; var u=list[i++];
+    fetch(u).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(b){ BLOBS[u]=URL.createObjectURL(b); }).catch(function(){}).then(function(){ setTimeout(nx,20); }); })();
+}
+
+/* ===== Voce ===== */
+var synth=("speechSynthesis" in window)?window.speechSynthesis:null;
+var roVoices=[], voice=null, voiceOn=true;
+function scoreV(v){var n=(v.name||"").toLowerCase(),s=0;
+  if(/natural|online|neural/.test(n))s+=10; if(/google/.test(n))s+=5; if(/microsoft/.test(n))s+=3; if(v.localService===false)s+=1; return s;}
+function loadVoices(){
+  if(!synth)return;
+  roVoices=synth.getVoices().filter(function(v){return /^ro([-_]|$)/i.test(v.lang||"");}).sort(function(a,b){return scoreV(b)-scoreV(a);});
+  var sel=$("gpVoiceSel");
+  if(roVoices.length){
+    if(!voice||roVoices.indexOf(voice)<0) voice=roVoices[0];
+    sel.innerHTML=roVoices.map(function(v,i){return '<option value="'+i+'">'+v.name.replace(/</g,"")+'</option>';}).join("");
+    sel.value=String(roVoices.indexOf(voice));
+    sel.classList.toggle("show",roVoices.length>1&&!HAS_AUDIO);
+  } else { voice=null; sel.classList.remove("show"); }
+  updateVstat();
+}
+function updateVstat(){
+  var el=$("gpVstat");
+  if(HAS_AUDIO){el.className="gp-vstat";el.innerHTML="🔊 Narațiune audio în română (voce AI), încărcată împreună cu pagina.";return;}
+  if(voice){el.className="gp-vstat";el.innerHTML="🔊 Voce în română găsită: <b>"+voice.name.replace(/</g,"")+"</b>";}
+  else{el.className="gp-vstat warn";el.innerHTML="⚠ <b>Nu am găsit o voce în română pe acest dispozitiv.</b> Prezentarea rulează cu subtitrări. Pe calculator încearcă Microsoft Edge (are voci românești naturale), iar pe telefon browserul implicit.";}
+}
+if(synth){loadVoices(); if("onvoiceschanged" in synth) synth.onvoiceschanged=loadVoices; setTimeout(loadVoices,600);} else {updateVstat();}
+$("gpVoiceSel").addEventListener("change",function(e){voice=roVoices[+e.target.value]||voice;updateVstat();if(playing)restartStep();});
+
+/* ===== Motor ===== */
+var si=0, ti=0, playing=false, started=false, token=0, timer=null, cancelCur=null;
+
+function splitS(t){return t.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g).map(function(x){return x.trim();}).filter(Boolean);}
+
+function render(){
+  scEls.forEach(function(el,i){el.classList.toggle("active",i===si);});
+  var el=scEls[si];
+  Array.prototype.forEach.call(el.querySelectorAll("[data-s]"),function(n){n.classList.toggle("in",+n.getAttribute("data-s")<=ti);});
+  Array.prototype.forEach.call(el.querySelectorAll("[data-f]"),function(n){
+    var on=n.getAttribute("data-f").split(",").indexOf(String(ti))>=0; n.classList.toggle("hl",on);});
+  var step=SCENES[si].steps[ti];
+  sm.setAttribute("data-pose",step.p);
+  segs.forEach(function(b,i){
+    var f=i<si?100:(i===si?((ti+1)/SCENES[i].steps.length*100):0);
+    b.firstChild.firstChild.style.width=f+"%"; b.classList.toggle("cur",i===si);});
+}
+function showSub(t){subTxt.textContent=t;}
+function setTalk(on){sm.classList.toggle("talk",!!on);}
+
+function stop(){
+  token++; clearTimeout(timer); timer=null;
+  if(cancelCur){cancelCur();cancelCur=null;}
+  setTalk(false);
+}
+function speakOne(text,done){
+  var fin=false, wd=null, sp=null, est=Math.max(1800,text.length*68+500);
+  function detach(){ player.onended=null; player.onerror=null; }
+  function end(){ if(fin)return; fin=true; clearTimeout(wd); clearTimeout(sp); detach(); cancelCur=null; done(); }
+  cancelCur=function(){fin=true;clearTimeout(wd);clearTimeout(sp);detach();try{player.pause();}catch(e){}try{if(synth)synth.cancel();}catch(e){}};
+  function viaBrowser(){   // rezervă: vocea browserului, apoi doar subtitrări cu timp estimat
+    if(fin)return;
+    clearTimeout(wd);
+    if(voiceOn&&voice&&synth){
+      try{
+        var u=new SpeechSynthesisUtterance(text);
+        u.voice=voice;u.lang=voice.lang||"ro-RO";u.rate=.96;u.pitch=1;
+        u.onend=end;u.onerror=end;
+        sp=setTimeout(function(){ if(!fin){ try{synth.speak(u);}catch(e){end();} } },120);
+        wd=setTimeout(end,est*2.2+4000);
+        return;
+      }catch(e){}
+    }
+    wd=setTimeout(end,est);
+  }
+  var src=AUDIO[text];
+  if(voiceOn&&src){
+    try{
+      var triedNet=!BLOBS[src];
+      player.onended=end;
+      player.onerror=function(){
+        if(fin)return;
+        if(!triedNet){ triedNet=true; BLOBS[src]=null; try{player.src=src;player.play();}catch(e){detach();viaBrowser();} return; }
+        detach(); viaBrowser();
+      };
+      player.src=BLOBS[src]||src;
+      var pr=player.play();
+      if(pr&&pr.catch){ pr.catch(function(){ if(fin)return; detach(); viaBrowser(); }); }
+      wd=setTimeout(function(){ if(fin)return; detach(); try{player.pause();}catch(e){} viaBrowser(); },est*2.2+4000);
+      return;
+    }catch(e){}
+  }
+  viaBrowser();
+}
+function runStep(){
+  stop(); var my=token; render();
+  var sents=splitS(SCENES[si].steps[ti].t), k=0;
+  (function next(){
+    if(my!==token)return;
+    if(k>=sents.length){ setTalk(false); timer=setTimeout(function(){ if(my===token) advance(); },700); return; }
+    var s=sents[k++]; showSub(s); setTalk(true);
+    speakOne(s,function(){ if(my!==token)return; setTalk(false); timer=setTimeout(next,220); });
+  })();
+}
+function advance(){
+  if(ti+1<SCENES[si].steps.length){ti++;runStep();}
+  else if(si+1<SCENES.length){si++;ti=0;runStep();}
+  else{ finish(); }
+}
+function finish(){
+  stop(); playing=false; gp.classList.remove("playing");
+  $("gpOverTitle").textContent="Gata! 🎉"; $("gpStartTxt").textContent="Vezi din nou";
+  $("gpOver").classList.remove("hide");
+  started=false; si=0; ti=0;
+}
+function restartStep(){ if(playing) runStep(); }
+function go(s,t){
+  si=Math.max(0,Math.min(SCENES.length-1,s)); ti=t||0;
+  if(!started){ hideOver(); }
+  if(playing){runStep();}
+  else{ stop(); render(); showSub(SCENES[si].steps[ti].t); }
+}
+function hideOver(){ started=true; $("gpOver").classList.add("hide"); }
+function play(){
+  if(!started){hideOver();}
+  playing=true; gp.classList.add("playing"); runStep();
+}
+function pause(){ playing=false; gp.classList.remove("playing"); stop(); showSub(SCENES[si].steps[ti].t); }
+function toggle(){ playing?pause():play(); }
+
+$("gpStart").addEventListener("click",function(){ si=si||0; play(); });
+$("gpPlay").addEventListener("click",toggle);
+$("gpPrev").addEventListener("click",function(){ if(ti>0&&false){} go(si-1,0); });
+$("gpNext").addEventListener("click",function(){ go(si+1,0); });
+$("gpVoice").addEventListener("click",function(){ voiceOn=!voiceOn; this.classList.toggle("off",!voiceOn); if(!voiceOn&&synth){try{synth.cancel();}catch(e){}} if(playing)restartStep(); });
+gp.setAttribute("tabindex","0");
+document.addEventListener("keydown",function(e){
+  if(e.target&&/select|input|textarea/i.test(e.target.tagName))return;
+  if(e.code==="Space"&&(e.target===document.body||e.target===gp)){e.preventDefault();toggle();}
+  else if(e.key==="ArrowRight")go(si+1,0);
+  else if(e.key==="ArrowLeft")go(si-1,0);
+});
+window.addEventListener("pagehide",function(){stop();});
+
+setTimeout(warmAudio,600);
+// prima randare (static, în spatele ecranului de start)
+render(); showSub(SCENES[0].steps[0].t);
+window.gpPlayer={go:go,play:play,pause:pause,scenes:SCENES};
+})();
+</script>
+</body>
+</html>

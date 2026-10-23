@@ -23,7 +23,7 @@ jobs:
       - name: stage site files
         run: |
           mkdir _site
-          cp -r index.html 404.html favicon.svg CNAME site.config.js css js _site/
+          cp -r gpuinfo CNAME _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
