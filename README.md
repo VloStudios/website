@@ -1,30 +1,24 @@
-# VloStudios Website (Sakura Iced Tea Remake)
+# personal site
 
-This repository now contains a full static-first remake of the site with a brand-new structure and visual direction:
+Plain HTML/CSS/JS. No build step, no dependencies.
 
-- Sakura + iced-tea themed landing page
-- Animated "raining iced tea" effect
-- Mini CV section powered by live GitHub profile/repo data for `VloStudios`
-- Custom themed `404.html` for GitHub Pages
+## customize
 
-## Project layout
+Edit **`site.config.js`**. Everything marked `REPLACE ME` is a placeholder (name, handle, intro, about, projects, contact). Sample projects are fake, replace or delete them. Empty `now`, `projects`, or contact fields hide themselves.
 
-- `/index.html` — primary site entrypoint
-- `/css/style.css` — complete redesign styles
-- `/js/main.js` — animation + GitHub data loading + CV/repo rendering
-- `/gpuinfo/index.html` — animated graphics card (GPU) presentation, served at `/gpuinfo`
-- `/404.html` — custom Sakura iced-tea 404 page
-- `/app.py` — optional local Flask serving
+Also update by hand: the `<title>` and meta tags in `index.html` (fallbacks for crawlers that don't run JS) and the colors in `css/style.css` (`:root`).
 
-## Run locally
+## run locally
 
-```bash
-pip install -r requirements.txt
-python app.py
-```
+    python3 -m http.server 8000
 
-Then open `http://localhost:5001`.
+then open http://localhost:8000
 
-## GitHub Pages compatibility
+## deploy to GitHub Pages
 
-GitHub Pages deploys from the repository root in this repo's workflow, so published assets (including `404.html`, `CNAME`, and `.nojekyll`) are kept at the root.
+1. Push this folder to a GitHub repo on branch `main`.
+2. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. Every push to `main` runs `.github/workflows/deploy.yml` and publishes. Check the Actions tab; the URL shows in the deploy job.
+4. Custom domain: add it under Settings → Pages, and the `CNAME` file (vlostudios.dev) is already in place.
+
+All paths are relative, so it works at `user.github.io/repo-name/` and at a custom domain. The 404 page works out of the box on both.
