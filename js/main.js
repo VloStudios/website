@@ -89,6 +89,9 @@
   });
   if (!cl.children.length) cl.appendChild(el("li", "nothing here yet. add your links in site.config.js"));
 
-  $("footer-text").textContent = "© " + s.name + ", " + new Date().getFullYear() + ". All Rights Reserved. " + s.signoff;
+  var foot = $("footer-text");
+  foot.textContent = "© " + s.name + ", " + new Date().getFullYear() + ". All Rights Reserved. read-only source, see ";
+  foot.appendChild(link("LICENSE", "https://github.com/VloStudios/website/blob/main/LICENSE"));
+  foot.appendChild(document.createTextNode(". " + s.signoff));
   // me when the code compiles (it doesn't compile, it's javascript)
 })();

@@ -1,6 +1,6 @@
 # personal site
 
-Plain HTML/CSS/JS. No build step, no dependencies.
+Read-only license (see LICENSE). Plain HTML/CSS/JS. No build step, no dependencies.
 
 ## customize
 
